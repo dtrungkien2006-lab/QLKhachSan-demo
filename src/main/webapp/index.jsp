@@ -13,6 +13,9 @@
     <li><a href="${pageContext.request.contextPath}/dat-phong?action=list">Danh sách đặt phòng</a></li>
     <li><a href="${pageContext.request.contextPath}/dat-phong?action=new">Tạo đặt phòng</a></li>
     <li><a href="${pageContext.request.contextPath}/khach-hang">Khách hàng</a></li>
+    <li><a href="${pageContext.request.contextPath}/hoa-don?action=list">Hóa đơn</a></li>
+    <li><a href="${pageContext.request.contextPath}/thong-ke">Thống kê (có biểu đồ)</a></li>
+    <li><a href="${pageContext.request.contextPath}/bao-cao">Báo cáo (có biểu đồ)</a></li>
 </ul>
 </body>
 </html>
