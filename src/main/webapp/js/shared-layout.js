@@ -81,15 +81,16 @@
 
         return `
             <a class="brand" href="${contextPath}/">
-                <span class="brand-mark">H</span>
+                <span class="brand-mark">UTE</span>
                 <span>
-                    <span class="brand-name">Horizon Hotel</span>
+                    <span class="brand-name">UTE Hotel</span>
                     <br>
                     <span class="brand-sub">HOTEL MANAGEMENT</span>
                 </span>
             </a>
 
             <div class="nav-label">Hệ thống</div>
+
             <nav class="nav-list">
                 ${nav}
             </nav>
@@ -108,14 +109,72 @@
 
         return `
             <div class="crumb">
-                Horizon Hotel /
+                UTE Hotel /
                 <strong>${current ? current.label : 'Quản lý'}</strong>
             </div>
-            <div class="user-chip">
-                <span class="user-name">Hệ thống quản lý khách sạn</span>
-                <span class="avatar">H</span>
+
+            <div class="topbar-actions">
+                <span class="topbar-system-name">
+                    Hệ thống quản lý khách sạn
+                </span>
+
+                <a class="topbar-logout"
+                   href="${contextPath}/logout"
+                   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')">
+                    <span aria-hidden="true">↪</span>
+                    Đăng xuất
+                </a>
             </div>
         `;
+    }
+
+    function loadTopbarUser() {
+        const nameEl = document.querySelector('.topbar-user-name');
+        const metaEl = document.querySelector('.topbar-user-meta');
+        const avatarEl = document.querySelector('.topbar-avatar');
+
+        if (!nameEl || !metaEl || !avatarEl) return;
+
+        fetch(`${contextPath}/session-info`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json'
+            },
+            cache: 'no-store'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Không lấy được thông tin đăng nhập');
+            }
+
+            return response.json();
+        })
+        .then(user => {
+            if (!user.authenticated) {
+                nameEl.textContent = 'Chưa đăng nhập';
+                metaEl.textContent = '';
+                avatarEl.textContent = 'H';
+                return;
+            }
+
+            const hoTen = user.hoTen || 'Nhân viên';
+            const maNV = user.maNV || '';
+            const vaiTro = user.vaiTro || '';
+
+            nameEl.textContent = hoTen;
+            metaEl.textContent =
+                `Mã NV: ${maNV} · ${vaiTro}`;
+
+            avatarEl.textContent =
+                hoTen.trim().charAt(0).toUpperCase() || 'H';
+        })
+        .catch(error => {
+            console.error('Lỗi tải thông tin nhân viên:', error);
+            nameEl.textContent = 'Không tải được thông tin';
+            metaEl.textContent = '';
+            avatarEl.textContent = 'H';
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -147,7 +206,7 @@
             page.className = 'page';
 
             // Giữ nguyên nội dung nghiệp vụ và không chuyển
-            // script shared-layout.js vào trong vùng nội dung.
+            // script shared-layout.js vào vùng nội dung.
             Array.from(body.childNodes).forEach(node => {
                 if (
                     node.nodeType === 1 &&
@@ -194,6 +253,7 @@
             main.insertBefore(topbar, main.firstChild);
         }
 
+        // Cập nhật nội dung topbar.
         topbar.innerHTML = topbarHtml();
 
         // Nạp CSS dùng chung nếu chưa được nạp.
@@ -211,5 +271,8 @@
             css.href = cssUrl;
             document.head.appendChild(css);
         }
+
+        // Lấy thông tin nhân viên từ session thông qua Servlet.
+        loadTopbarUser();
     });
 })();
