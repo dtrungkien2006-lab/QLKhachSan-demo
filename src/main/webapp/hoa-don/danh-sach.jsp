@@ -20,6 +20,20 @@
 <h1>Danh sách hóa đơn</h1>
 <a href="${pageContext.request.contextPath}/">Trang chủ</a>
 <a href="${pageContext.request.contextPath}/dat-phong?action=list">Đặt phòng</a>
+<a href="${pageContext.request.contextPath}/thong-ke">Thống kê</a>
+<a href="${pageContext.request.contextPath}/bao-cao">Báo cáo</a>
+
+<form method="get" action="${pageContext.request.contextPath}/hoa-don" style="margin:15px 0;">
+    <input type="hidden" name="action" value="search">
+    <input type="text" name="q" value="${param.q}" placeholder="Mã hóa đơn / mã đặt phòng / tên khách">
+    <select name="trangThai">
+        <option value="">-- Tất cả trạng thái --</option>
+        <option value="NHAP" ${param.trangThai == 'NHAP' ? 'selected' : ''}>NHAP</option>
+        <option value="DA_PHAT_HANH" ${param.trangThai == 'DA_PHAT_HANH' ? 'selected' : ''}>DA_PHAT_HANH</option>
+        <option value="DA_HUY" ${param.trangThai == 'DA_HUY' ? 'selected' : ''}>DA_HUY</option>
+    </select>
+    <button type="submit">Tìm kiếm</button>
+</form>
 
 <c:if test="${not empty param.success}">
     <div class="success">Thao tác thành công.</div>

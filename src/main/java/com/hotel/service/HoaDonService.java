@@ -517,6 +517,29 @@ public class HoaDonService {
         }
     }
 
+    /**
+     * Tìm kiếm hóa đơn theo từ khóa (mã hóa đơn, mã đặt phòng, tên khách) và trạng thái.
+     * Tham số nào null/rỗng thì bỏ qua điều kiện đó.
+     */
+    public List<HoaDon> timKiem(String tuKhoa, TrangThaiHoaDon trangThai) {
+        String kw = tuKhoa == null ? "" : tuKhoa.trim().toLowerCase();
+        List<HoaDon> ketQua = new ArrayList<>();
+        for (HoaDon h : findAll()) {
+            if (trangThai != null && h.getTrangThai() != trangThai) continue;
+            if (!kw.isEmpty()) {
+                String hoTen = h.getDatPhong() != null && h.getDatPhong().getKhachHang() != null
+                        ? h.getDatPhong().getKhachHang().getHoTen() : "";
+                String maDp = h.getDatPhong() != null ? h.getDatPhong().getMaDatPhong() : "";
+                boolean khop = h.getMaHoaDon().toLowerCase().contains(kw)
+                        || (maDp != null && maDp.toLowerCase().contains(kw))
+                        || (hoTen != null && hoTen.toLowerCase().contains(kw));
+                if (!khop) continue;
+            }
+            ketQua.add(h);
+        }
+        return ketQua;
+    }
+
     /** Xóa hóa đơn chỉ khi còn ở trạng thái NHAP. */
     public void xoa(String maHoaDon) {
         TransactionManager transactionManager = new TransactionManager();
