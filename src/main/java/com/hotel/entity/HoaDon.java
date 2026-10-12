@@ -33,7 +33,7 @@ public class HoaDon {
     private BigDecimal tongTien;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trangThai", nullable = false, length = 20)
+    @Column(name = "trangThai", nullable = false, length = 30)
     private TrangThaiHoaDon trangThai;
 
     @OneToMany(mappedBy = "hoaDon")

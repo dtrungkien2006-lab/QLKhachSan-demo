@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Quản lý nhân viên</title>
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Quản lý nhân viên</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
 <style>body{font-family:Arial,sans-serif;max-width:1250px;margin:30px auto}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border:1px solid #ddd;padding:8px}th{background:#f5f5f5}.success{padding:10px;background:#e7f7e7}.error{padding:10px;background:#ffe5e5}a{margin-right:8px}.locked{color:#b00020;font-weight:bold}.active{color:#087f23;font-weight:bold}.actions{line-height:2}</style></head>
 <body>
 <h1>Quản lý nhân viên & tài khoản</h1>
@@ -15,4 +15,4 @@
 <td><c:choose><c:when test="${item.taiKhoan.trangThai == 'HOAT_DONG'}"><span class="active">Hoạt động</span></c:when><c:otherwise><span class="locked">Đã khóa</span></c:otherwise></c:choose></td>
 <td class="actions"><a href="${pageContext.request.contextPath}/nhan-vien?action=detail&id=${item.maNV}">Chi tiết</a><a href="${pageContext.request.contextPath}/nhan-vien?action=edit&id=${item.maNV}">Sửa</a><a href="${pageContext.request.contextPath}/nhan-vien?action=role&id=${item.maNV}">Đổi vai trò</a><a href="${pageContext.request.contextPath}/nhan-vien?action=password&id=${item.maNV}">Đổi mật khẩu</a><a href="${pageContext.request.contextPath}/nhan-vien?action=toggle&id=${item.maNV}" onclick="return confirm('Thay đổi trạng thái tài khoản?')">${item.taiKhoan.trangThai == 'HOAT_DONG' ? 'Khóa' : 'Mở khóa'}</a></td>
 </tr></c:forEach><c:if test="${empty items}"><tr><td colspan="7">Chưa có dữ liệu.</td></tr></c:if></tbody></table>
-</body></html>
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body></html>

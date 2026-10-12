@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết khách hàng</title>
+    <title>Chi tiết khách hàng</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
 
     <style>
         * {
@@ -237,6 +237,6 @@
     </div>
 
 </div>
-</body>
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body>
 </html>
 ```

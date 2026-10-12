@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${mode == 'new' ? 'Thêm nhân viên' : 'Sửa nhân viên'}</title><style>body{font-family:Arial;max-width:760px;margin:30px auto}label{display:block;margin-top:12px}input,select{width:100%;padding:9px;box-sizing:border-box;margin-top:5px}.btn{margin-top:20px;padding:10px 18px}.error{padding:10px;background:#ffe5e5}</style></head><body>
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>${mode == 'new' ? 'Thêm nhân viên' : 'Sửa nhân viên'}</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css"><style>body{font-family:Arial;max-width:760px;margin:30px auto}label{display:block;margin-top:12px}input,select{width:100%;padding:9px;box-sizing:border-box;margin-top:5px}.btn{margin-top:20px;padding:10px 18px}.error{padding:10px;background:#ffe5e5}</style></head><body>
 <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
 <h1>${mode == 'new' ? 'Tạo nhân viên và tài khoản' : 'Cập nhật thông tin nhân viên'}</h1><a href="${pageContext.request.contextPath}/nhan-vien?action=list">← Danh sách</a>
 <c:if test="${not empty error}"><div class="error">${error}</div></c:if>
@@ -17,4 +17,4 @@
 <label>Mật khẩu ban đầu <input type="password" name="matKhauBanDau" required></label>
 <label>Xác nhận mật khẩu <input type="password" name="xacNhanMatKhau" required></label>
 </c:if>
-<button class="btn" type="submit">Lưu</button></form></body></html>
+<button class="btn" type="submit">Lưu</button></form><script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body></html>

@@ -19,7 +19,7 @@ public class DatPhong {
     private LocalDateTime ngayDat;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trangThai", nullable = false, length = 20)
+    @Column(name = "trangThai", nullable = false, length = 30)
     private TrangThaiDatPhong trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,7 +41,7 @@ public class DatPhong {
     @JoinColumn(name = "maNVCheckOut")
     private NhanVien nhanVienCheckOut;
 
-    @Column(name = "ghiChu", length = 255)
+    @Column(name = "ghiChu", length = 500)
     private String ghiChu;
 
     @OneToMany(mappedBy = "datPhong")
