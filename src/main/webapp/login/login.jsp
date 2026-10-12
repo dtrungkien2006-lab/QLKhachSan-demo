@@ -1,12 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="vi"><head><meta charset="UTF-8"><title>Đăng nhập nhân viên</title>
-<style>body{font-family:Arial,sans-serif;background:#f4f6f8}.box{width:380px;margin:90px auto;background:#fff;padding:28px;border-radius:8px;box-shadow:0 2px 12px #ddd}label{display:block;margin-top:14px}input{width:100%;box-sizing:border-box;padding:10px;margin-top:6px}.btn{margin-top:20px;width:100%;padding:10px}.error{margin:10px 0;padding:10px;background:#ffe5e5}</style></head>
-<body><div class="box"><h2>Đăng nhập nhân viên</h2>
-<c:if test="${not empty error}"><div class="error">${error}</div></c:if>
-<form method="post" action="${pageContext.request.contextPath}/login">
-<label>Mã nhân viên</label><input name="maNV" value="${maNV}" required autofocus>
-<label>Mật khẩu</label><input type="password" name="matKhau" required>
-<button class="btn" type="submit">Đăng nhập</button>
-</form></div></body></html>
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng nhập | Horizon Hotel</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css"></head>
+<body><div class="login-page"><section class="login-side"><div class="brand"><span class="brand-mark">H</span><span><span class="brand-name">Horizon Hotel</span><br><span class="brand-sub">HOTEL MANAGEMENT</span></span></div><div><div class="login-art">⌂</div><h1>Vận hành khách sạn, đơn giản hơn.</h1><p>Không gian quản lý tập trung cho đặt phòng, khách hàng, dịch vụ và thanh toán.</p></div><div style="font-size:12px;color:#a9bfd5">QLKhachSan · Hệ thống nội bộ</div></section>
+<section class="login-main"><div class="login-box"><div class="eyebrow">Chào mừng trở lại</div><h2>Đăng nhập hệ thống</h2><p class="muted">Sử dụng tài khoản nhân viên để tiếp tục.</p><c:if test="${not empty error}"><div class="error"><c:out value="${error}"/></div></c:if>
+<form method="post" action="${pageContext.request.contextPath}/login"><label class="field"><span>Mã nhân viên</span><input name="maNV" value="<c:out value='${maNV}'/>" placeholder="Ví dụ: 24110261" autocomplete="username" required autofocus></label><label class="field"><span>Mật khẩu</span><input type="password" name="matKhau" placeholder="Nhập mật khẩu" autocomplete="current-password" required></label><button class="btn btn-primary" type="submit">Đăng nhập <span>→</span></button></form><div class="login-foot">Bảo mật tài khoản · Chỉ dành cho nhân viên được cấp quyền</div></div></section></div></body></html>

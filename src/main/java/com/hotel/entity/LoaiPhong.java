@@ -17,7 +17,7 @@ public class LoaiPhong {
     @Column(name = "tenLoaiPhong", nullable = false, unique = true, length = 100)
     private String tenLoaiPhong;
 
-    @Column(name = "moTa", length = 255)
+    @Column(name = "moTa", length = 500)
     private String moTa;
 
     @Column(name = "giaCoBan", nullable = false, precision = 12, scale = 2)

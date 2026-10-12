@@ -23,11 +23,11 @@ public class ThanhToan {
     private BigDecimal soTien;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "phuongThuc", nullable = false, length = 20)
+    @Column(name = "phuongThuc", nullable = false, length = 30)
     private PhuongThucThanhToan phuongThuc;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trangThai", nullable = false, length = 20)
+    @Column(name = "trangThai", nullable = false, length = 30)
     private TrangThaiThanhToan trangThai;
 
     @Column(name = "maGiaoDich", length = 100)

@@ -1,170 +1,152 @@
+
 package com.hotel.service;
 
 import com.hotel.config.TransactionManager;
 import com.hotel.dao.CtHoaDonDAO;
 import com.hotel.dao.HoaDonDAO;
 import com.hotel.dao.SuDungDichVuDAO;
+import com.hotel.dao.ThanhToanDAO;
 import com.hotel.entity.CtDatPhong;
 import com.hotel.entity.CtHoaDon;
 import com.hotel.entity.DatPhong;
 import com.hotel.entity.DichVu;
 import com.hotel.entity.HoaDon;
 import com.hotel.entity.SuDungDichVu;
+import com.hotel.entity.ThanhToan;
 import com.hotel.enums.TrangThaiHoaDon;
+import com.hotel.enums.TrangThaiDatPhong;
+import com.hotel.enums.TrangThaiThanhToan;
+import com.hotel.util.MaCodeGenerator;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.hotel.util.MaCodeGenerator;
 
 public class HoaDonService {
 
-    private final HoaDonDAO hoaDonDAO;
-    private final CtHoaDonDAO ctHoaDonDAO;
-    private final SuDungDichVuDAO suDungDichVuDAO;
-
-    public HoaDonService() {
-        this.hoaDonDAO = new HoaDonDAO();
-        this.ctHoaDonDAO = new CtHoaDonDAO();
-        this.suDungDichVuDAO = new SuDungDichVuDAO();
-    }
+    private final HoaDonDAO hoaDonDAO = new HoaDonDAO();
+    private final CtHoaDonDAO ctHoaDonDAO = new CtHoaDonDAO();
+    private final SuDungDichVuDAO suDungDichVuDAO =
+            new SuDungDichVuDAO();
+    private final ThanhToanDAO thanhToanDAO =
+            new ThanhToanDAO();
 
     /**
-     * Lập/cập nhật hóa đơn duy nhất của một DatPhong.
-     * Hóa đơn được tạo ngay khi đặt phòng; phương thức này chỉ
-     * phục vụ tương thích và sẽ cập nhật lại hóa đơn hiện có.
+     * Tạo hoặc cập nhật hóa đơn cho một đặt phòng.
+     * Nếu hóa đơn đã tồn tại thì cập nhật chi tiết, không tạo trùng.
      */
     public HoaDon taoHoaDon(String maDatPhong) {
-
-        TransactionManager transactionManager =
-                new TransactionManager();
+        TransactionManager tm = new TransactionManager();
 
         try {
-            transactionManager.begin();
-
-            EntityManager em =
-                    transactionManager.getEntityManager();
+            tm.begin();
+            EntityManager em = tm.getEntityManager();
 
             DatPhong datPhong = em.find(
-                    DatPhong.class,
-                    maDatPhong
-            );
+                    DatPhong.class, maDatPhong);
 
             if (datPhong == null) {
                 throw new IllegalArgumentException(
-                        "Không tìm thấy đặt phòng: "
-                                + maDatPhong
-                );
+                        "Không tìm thấy đặt phòng: " + maDatPhong);
             }
 
-            if (datPhong.getTrangThai() == com.hotel.enums.TrangThaiDatPhong.DA_HUY) {
-                throw new IllegalStateException("Không thể lập hóa đơn cho đặt phòng đã hủy.");
+            if (datPhong.getTrangThai()
+                    == TrangThaiDatPhong.DA_HUY) {
+                throw new IllegalStateException(
+                        "Không thể lập hóa đơn cho đặt phòng đã hủy.");
             }
 
             if (datPhong.getChiTietDatPhong() == null
                     || datPhong.getChiTietDatPhong().isEmpty()) {
-
                 throw new IllegalStateException(
-                        "Đặt phòng không có chi tiết phòng."
-                );
+                        "Đặt phòng không có chi tiết phòng.");
             }
-
-            /*
-             * ==========================================
-             * 1. TÍNH TIỀN PHÒNG
-             * ==========================================
-             */
 
             BigDecimal tongTienPhong = BigDecimal.ZERO;
+            BigDecimal tongTienDichVu = BigDecimal.ZERO;
+            List<CtHoaDon> chiTietMoi = new ArrayList<>();
 
-            List<CtHoaDon> chiTietHoaDon =
-                    new ArrayList<>();
+            // Tính tiền phòng.
+            for (CtDatPhong ct : datPhong.getChiTietDatPhong()) {
+                BigDecimal tienPhong = tinhTienPhong(ct);
+                tongTienPhong = tongTienPhong.add(tienPhong);
 
-            for (CtDatPhong ctDatPhong
-                    : datPhong.getChiTietDatPhong()) {
+                CtHoaDon line = new CtHoaDon();
+                line.setTenKhoanThu(
+                        "Tiền phòng "
+                        + (ct.getPhong() != null
+                           ? ct.getPhong().getSoPhong()
+                           : ""));
+                line.setSoLuong(1);
+                line.setDonGia(ct.getGiaPhong());
+                line.setThanhTien(tienPhong);
 
-                BigDecimal tienPhong =
-                        tinhTienPhong(ctDatPhong);
-
-                tongTienPhong =
-                        tongTienPhong.add(tienPhong);
-
-                CtHoaDon ctHoaDon = taoChiTietTienPhong(
-                        ctDatPhong,
-                        tienPhong
-                );
-
-                chiTietHoaDon.add(ctHoaDon);
+                chiTietMoi.add(line);
             }
 
-            /*
-             * ==========================================
-             * 2. TÍNH TIỀN DỊCH VỤ
-             * ==========================================
-             */
-
+            // Tính tiền dịch vụ.
             List<SuDungDichVu> danhSachSuDung =
                     suDungDichVuDAO.findByDatPhong(
-                            em,
-                            maDatPhong
-                    );
+                            em, maDatPhong);
 
-            BigDecimal tongTienDichVu =
-                    BigDecimal.ZERO;
-
-            for (SuDungDichVu suDung
-                    : danhSachSuDung) {
-
-                BigDecimal tienDichVu =
-                        tinhTienDichVu(suDung);
-
+            for (SuDungDichVu sd : danhSachSuDung) {
+                BigDecimal tienDichVu = tinhTienDichVu(sd);
                 tongTienDichVu =
                         tongTienDichVu.add(tienDichVu);
 
-                CtHoaDon ctHoaDon =
-                        taoChiTietDichVu(
-                                suDung,
-                                tienDichVu
-                        );
-
-                chiTietHoaDon.add(ctHoaDon);
+                CtHoaDon line = taoChiTietDichVu(
+                        sd, tienDichVu);
+                chiTietMoi.add(line);
             }
-
-            /*
-             * ==========================================
-             * 3. TỔNG TIỀN
-             * ==========================================
-             */
 
             BigDecimal tongTien =
                     tongTienPhong.add(tongTienDichVu);
 
-            /*
-             * ==========================================
-             * 4. TẠO HÓA ĐƠN
-             * ==========================================
-             */
+            // Tìm hóa đơn hiện có.
+            List<HoaDon> hoaDons =
+                    hoaDonDAO.findByDatPhong(em, maDatPhong);
 
-            List<HoaDon> hoaDons = hoaDonDAO.findByDatPhong(em, maDatPhong);
             HoaDon hoaDon;
+
             if (hoaDons.isEmpty()) {
                 hoaDon = new HoaDon();
-                hoaDon.setMaHoaDon(MaCodeGenerator.nextId(hoaDonDAO.findAll(em), "maHoaDon", "HD"));
+                hoaDon.setMaHoaDon(
+                        MaCodeGenerator.nextId(
+                                hoaDonDAO.findAll(em),
+                                "maHoaDon",
+                                "HD"));
+
                 hoaDon.setDatPhong(datPhong);
                 hoaDon.setNgayLap(LocalDateTime.now());
+                hoaDon.setTrangThai(TrangThaiHoaDon.NHAP);
+
                 hoaDonDAO.save(em, hoaDon);
             } else {
                 hoaDon = hoaDons.get(0);
-                if (hoaDon.getTrangThai() == TrangThaiHoaDon.DA_PHAT_HANH) {
-                    throw new IllegalStateException("Hóa đơn đã phát hành, không thể tạo lại.");
+
+                if (hoaDon.getTrangThai()
+                        == TrangThaiHoaDon.DA_HUY) {
+                    throw new IllegalStateException(
+                            "Hóa đơn đã hủy, không thể cập nhật.");
                 }
+
+                if (hoaDon.getTrangThai()
+                        == TrangThaiHoaDon.DA_PHAT_HANH) {
+                    throw new IllegalStateException(
+                            "Hóa đơn đã phát hành. "
+                            + "Không thể tự động tính lại hóa đơn.");
+                }
+
                 for (CtHoaDon old : ctHoaDonDAO.findAll(em)) {
-                    if (old.getHoaDon() != null && hoaDon.getMaHoaDon().equals(old.getHoaDon().getMaHoaDon())) {
+                    if (old.getHoaDon() != null
+                            && hoaDon.getMaHoaDon().equals(
+                                    old.getHoaDon().getMaHoaDon())) {
                         ctHoaDonDAO.delete(em, old);
                     }
                 }
@@ -174,404 +156,285 @@ public class HoaDonService {
             hoaDon.setTongTienDichVu(tongTienDichVu);
             hoaDon.setTongTien(tongTien);
 
-            hoaDon.setTrangThai(
-                    TrangThaiHoaDon.NHAP
-            );
-
             hoaDonDAO.update(em, hoaDon);
 
-            /*
-             * ==========================================
-             * 5. TẠO CHI TIẾT HÓA ĐƠN
-             * ==========================================
-             */
+            Set<String> maDaSinh = new HashSet<>();
 
-            Set<String> maCtDaSinh = new HashSet<>();
-            for (CtHoaDon ctHoaDon : chiTietHoaDon) {
-                ctHoaDon.setMaCtHoaDon(MaCodeGenerator.nextId(
-                        ctHoaDonDAO.findAll(em), "maCtHoaDon", "CTHD", maCtDaSinh));
-                maCtDaSinh.add(ctHoaDon.getMaCtHoaDon());
-                ctHoaDon.setHoaDon(hoaDon);
+            for (CtHoaDon line : chiTietMoi) {
+                line.setMaCtHoaDon(
+                        MaCodeGenerator.nextId(
+                                ctHoaDonDAO.findAll(em),
+                                "maCtHoaDon",
+                                "CTHD",
+                                maDaSinh));
 
-                ctHoaDonDAO.save(
-                        em,
-                        ctHoaDon
-                );
+                maDaSinh.add(line.getMaCtHoaDon());
+                line.setHoaDon(hoaDon);
+                ctHoaDonDAO.save(em, line);
             }
 
-            transactionManager.commit();
-
+            tm.commit();
             return hoaDon;
 
         } catch (Exception e) {
-
-            transactionManager.rollback();
-
+            tm.rollback();
             throw e;
-
         } finally {
-
-            transactionManager.close();
+            tm.close();
         }
     }
 
-    /**
-     * Tính tiền phòng.
-     *
-     * Số tiền = số đêm × giá phòng.
-     */
-    private BigDecimal tinhTienPhong(
-            CtDatPhong ctDatPhong) {
-
-        if (ctDatPhong.getNgayNhan() == null
-                || ctDatPhong.getNgayTra() == null) {
-
+    private BigDecimal tinhTienPhong(CtDatPhong ct) {
+        if (ct.getNgayNhan() == null
+                || ct.getNgayTra() == null
+                || ct.getGiaPhong() == null) {
             throw new IllegalArgumentException(
-                    "Chi tiết đặt phòng thiếu ngày nhận/trả."
-            );
+                    "Chi tiết đặt phòng thiếu ngày hoặc giá phòng.");
         }
 
-        if (ctDatPhong.getGiaPhong() == null) {
-
-            throw new IllegalArgumentException(
-                    "Chi tiết đặt phòng thiếu giá phòng."
-            );
-        }
-
-        long soDem =
-                java.time.temporal.ChronoUnit.DAYS.between(
-                        ctDatPhong.getNgayNhan(),
-                        ctDatPhong.getNgayTra()
-                );
+        long soDem = ChronoUnit.DAYS.between(
+                ct.getNgayNhan(), ct.getNgayTra());
 
         if (soDem <= 0) {
             throw new IllegalArgumentException(
-                    "Số đêm lưu trú phải lớn hơn 0."
-            );
+                    "Số đêm lưu trú phải lớn hơn 0.");
         }
 
-        return ctDatPhong.getGiaPhong()
-                .multiply(
-                        BigDecimal.valueOf(soDem)
-                );
+        return ct.getGiaPhong().multiply(
+                BigDecimal.valueOf(soDem));
     }
 
-    /**
-     * Tính tiền sử dụng dịch vụ.
-     */
-    private BigDecimal tinhTienDichVu(
-            SuDungDichVu suDungDichVu) {
-
-        if (suDungDichVu.getSoLuong() == null) {
+    private BigDecimal tinhTienDichVu(SuDungDichVu sd) {
+        if (sd.getSoLuong() == null
+                || sd.getDonGia() == null
+                || sd.getSoLuong() <= 0) {
             throw new IllegalArgumentException(
-                    "Số lượng dịch vụ không được null."
-            );
+                    "Số lượng hoặc đơn giá dịch vụ không hợp lệ.");
         }
 
-        if (suDungDichVu.getDonGia() == null) {
-            throw new IllegalArgumentException(
-                    "Đơn giá dịch vụ không được null."
-            );
-        }
-
-        return suDungDichVu.getDonGia()
-                .multiply(
-                        BigDecimal.valueOf(
-                                suDungDichVu.getSoLuong()
-                        )
-                );
+        return sd.getDonGia().multiply(
+                BigDecimal.valueOf(sd.getSoLuong()));
     }
 
-    /**
-     * Tạo chi tiết hóa đơn cho tiền phòng.
-     */
-    private CtHoaDon taoChiTietTienPhong(
-            CtDatPhong ctDatPhong,
-            BigDecimal thanhTien) {
-
-        CtHoaDon ctHoaDon = new CtHoaDon();
-
-        ctHoaDon.setTenKhoanThu(
-                "Tiền phòng "
-                        + ctDatPhong
-                        .getPhong()
-                        .getSoPhong()
-        );
-
-        ctHoaDon.setSoLuong(1);
-
-        ctHoaDon.setDonGia(
-                ctDatPhong.getGiaPhong()
-        );
-
-        ctHoaDon.setThanhTien(
-                thanhTien
-        );
-
-        return ctHoaDon;
-    }
-
-    /**
-     * Tạo chi tiết hóa đơn cho dịch vụ.
-     */
     private CtHoaDon taoChiTietDichVu(
-            SuDungDichVu suDungDichVu,
-            BigDecimal thanhTien) {
+            SuDungDichVu sd, BigDecimal thanhTien) {
 
-        CtHoaDon ctHoaDon = new CtHoaDon();
+        CtHoaDon line = new CtHoaDon();
+        DichVu dichVu = sd.getDichVu();
 
-        DichVu dichVu =
-                suDungDichVu.getDichVu();
-
-        ctHoaDon.setTenKhoanThu(
+        line.setTenKhoanThu(
                 dichVu != null
                         ? dichVu.getTenDichVu()
-                        : "Dịch vụ"
-        );
+                        : "Dịch vụ");
 
-        ctHoaDon.setSoLuong(suDungDichVu.getSoLuong());
+        line.setSoLuong(sd.getSoLuong());
+        line.setDonGia(sd.getDonGia());
+        line.setThanhTien(thanhTien);
 
-        ctHoaDon.setDonGia(
-                suDungDichVu.getDonGia()
-        );
-
-        ctHoaDon.setThanhTien(
-                thanhTien
-        );
-
-        return ctHoaDon;
+        return line;
     }
 
-    /**
-     * Phát hành hóa đơn.
-     */
-    public void phatHanhHoaDon(
-            String maHoaDon) {
-
-        TransactionManager transactionManager =
-                new TransactionManager();
+    public void phatHanhHoaDon(String maHoaDon) {
+        TransactionManager tm = new TransactionManager();
 
         try {
-            transactionManager.begin();
+            tm.begin();
+            EntityManager em = tm.getEntityManager();
 
-            EntityManager em =
-                    transactionManager.getEntityManager();
+            HoaDon hd = hoaDonDAO.findById(em, maHoaDon);
 
-            HoaDon hoaDon =
-                    hoaDonDAO.findById(
-                            em,
-                            maHoaDon
-                    );
-
-            if (hoaDon == null) {
+            if (hd == null) {
                 throw new IllegalArgumentException(
-                        "Không tìm thấy hóa đơn: "
-                                + maHoaDon
-                );
+                        "Không tìm thấy hóa đơn: " + maHoaDon);
             }
 
-            if (hoaDon.getTrangThai()
-                    != TrangThaiHoaDon.NHAP) {
-
+            if (hd.getTrangThai() != TrangThaiHoaDon.NHAP) {
                 throw new IllegalStateException(
-                        "Chỉ hóa đơn ở trạng thái NHAP "
-                                + "mới được phát hành."
-                );
+                        "Chỉ hóa đơn NHAP mới được phát hành.");
             }
 
-            hoaDon.setTrangThai(
-                    TrangThaiHoaDon.DA_PHAT_HANH
-            );
+            hd.setTrangThai(TrangThaiHoaDon.DA_PHAT_HANH);
+            hoaDonDAO.update(em, hd);
 
-            hoaDonDAO.update(
-                    em,
-                    hoaDon
-            );
-
-            transactionManager.commit();
-
+            tm.commit();
         } catch (Exception e) {
-
-            transactionManager.rollback();
-
+            tm.rollback();
             throw e;
-
         } finally {
-
-            transactionManager.close();
+            tm.close();
         }
     }
 
-    /**
-     * Hủy hóa đơn.
-     */
-    public void huyHoaDon(
-            String maHoaDon) {
-
-        TransactionManager transactionManager =
-                new TransactionManager();
+    public void huyHoaDon(String maHoaDon) {
+        TransactionManager tm = new TransactionManager();
 
         try {
-            transactionManager.begin();
+            tm.begin();
+            EntityManager em = tm.getEntityManager();
 
-            EntityManager em =
-                    transactionManager.getEntityManager();
+            HoaDon hd = hoaDonDAO.findById(em, maHoaDon);
 
-            HoaDon hoaDon =
-                    hoaDonDAO.findById(
-                            em,
-                            maHoaDon
-                    );
-
-            if (hoaDon == null) {
+            if (hd == null) {
                 throw new IllegalArgumentException(
-                        "Không tìm thấy hóa đơn: "
-                                + maHoaDon
-                );
+                        "Không tìm thấy hóa đơn: " + maHoaDon);
             }
 
-            if (hoaDon.getTrangThai()
-                    == TrangThaiHoaDon.DA_HUY) {
-
+            if (hd.getTrangThai() == TrangThaiHoaDon.DA_HUY) {
                 throw new IllegalStateException(
-                        "Hóa đơn đã được hủy."
-                );
+                        "Hóa đơn đã được hủy.");
             }
 
-            hoaDon.setTrangThai(
-                    TrangThaiHoaDon.DA_HUY
-            );
+            hd.setTrangThai(TrangThaiHoaDon.DA_HUY);
+            hoaDonDAO.update(em, hd);
 
-            hoaDonDAO.update(
-                    em,
-                    hoaDon
-            );
-
-            transactionManager.commit();
-
+            tm.commit();
         } catch (Exception e) {
-
-            transactionManager.rollback();
-
+            tm.rollback();
             throw e;
-
         } finally {
-
-            transactionManager.close();
+            tm.close();
         }
     }
 
-    /**
-     * Tìm hóa đơn theo mã.
-     */
     public HoaDon findById(String maHoaDon) {
-
-        TransactionManager transactionManager =
-                new TransactionManager();
+        TransactionManager tm = new TransactionManager();
 
         try {
-            EntityManager em =
-                    transactionManager.getEntityManager();
-
-            HoaDon hoaDon = hoaDonDAO.findById(em, maHoaDon);
-            initialize(hoaDon);
-            return hoaDon;
-
+            HoaDon hd = hoaDonDAO.findById(
+                    tm.getEntityManager(), maHoaDon);
+            initialize(hd);
+            return hd;
         } finally {
+            tm.close();
+        }
+    }
 
-            transactionManager.close();
+    public List<HoaDon> findByDatPhong(String maDatPhong) {
+        TransactionManager tm = new TransactionManager();
+
+        try {
+            List<HoaDon> items = hoaDonDAO.findByDatPhong(
+                    tm.getEntityManager(), maDatPhong);
+            items.forEach(this::initialize);
+            return items;
+        } finally {
+            tm.close();
         }
     }
 
     /**
-     * Lấy tất cả hóa đơn của một đặt phòng.
+     * Danh sách hóa đơn còn số tiền phải thu.
+     * Hóa đơn đã thanh toán đủ không xuất hiện trong danh sách này.
+     * Không xóa hóa đơn hoặc lịch sử giao dịch khỏi database.
      */
-    public List<HoaDon> findByDatPhong(
-            String maDatPhong) {
-
-        TransactionManager transactionManager =
-                new TransactionManager();
+    public List<HoaDon> findHoaDonConPhaiThu() {
+        TransactionManager tm = new TransactionManager();
 
         try {
-            EntityManager em =
-                    transactionManager.getEntityManager();
+            EntityManager em = tm.getEntityManager();
 
-            List<HoaDon> items = hoaDonDAO.findByDatPhong(em, maDatPhong);
-            items.forEach(this::initialize);
-            return items;
+            List<HoaDon> danhSach = hoaDonDAO.findAll(em);
+            List<HoaDon> ketQua = new ArrayList<>();
+
+            for (HoaDon hoaDon : danhSach) {
+                if (hoaDon.getTrangThai()
+                        == TrangThaiHoaDon.DA_HUY) {
+                    continue;
+                }
+
+                if (hoaDon.getTongTien() == null
+                        || hoaDon.getDatPhong() == null) {
+                    continue;
+                }
+
+                String maDatPhong =
+                        hoaDon.getDatPhong().getMaDatPhong();
+
+                BigDecimal daThanhToan = BigDecimal.ZERO;
+
+                List<ThanhToan> giaoDich =
+                        thanhToanDAO.findByDatPhong(em, maDatPhong);
+
+                for (ThanhToan tt : giaoDich) {
+                    if (tt.getTrangThai()
+                            == TrangThaiThanhToan.DA_THANH_TOAN
+                            && tt.getSoTien() != null) {
+                        daThanhToan =
+                                daThanhToan.add(tt.getSoTien());
+                    }
+                }
+
+                BigDecimal conPhaiThu =
+                        hoaDon.getTongTien().subtract(daThanhToan);
+
+                if (conPhaiThu.compareTo(BigDecimal.ZERO) > 0) {
+                    initialize(hoaDon);
+                    ketQua.add(hoaDon);
+                }
+            }
+
+            return ketQua;
 
         } finally {
-
-            transactionManager.close();
+            tm.close();
         }
     }
-    /** Lấy toàn bộ hóa đơn. */
+
     public List<HoaDon> findAll() {
-        TransactionManager transactionManager = new TransactionManager();
+        TransactionManager tm = new TransactionManager();
+
         try {
-            List<HoaDon> items = hoaDonDAO.findAll(transactionManager.getEntityManager());
+            List<HoaDon> items =
+                    hoaDonDAO.findAll(tm.getEntityManager());
             items.forEach(this::initialize);
             return items;
         } finally {
-            transactionManager.close();
+            tm.close();
         }
     }
 
-    /**
-     * Tìm kiếm hóa đơn theo từ khóa (mã hóa đơn, mã đặt phòng, tên khách) và trạng thái.
-     * Tham số nào null/rỗng thì bỏ qua điều kiện đó.
-     */
-    public List<HoaDon> timKiem(String tuKhoa, TrangThaiHoaDon trangThai) {
-        String kw = tuKhoa == null ? "" : tuKhoa.trim().toLowerCase();
-        List<HoaDon> ketQua = new ArrayList<>();
-        for (HoaDon h : findAll()) {
-            if (trangThai != null && h.getTrangThai() != trangThai) continue;
-            if (!kw.isEmpty()) {
-                String hoTen = h.getDatPhong() != null && h.getDatPhong().getKhachHang() != null
-                        ? h.getDatPhong().getKhachHang().getHoTen() : "";
-                String maDp = h.getDatPhong() != null ? h.getDatPhong().getMaDatPhong() : "";
-                boolean khop = h.getMaHoaDon().toLowerCase().contains(kw)
-                        || (maDp != null && maDp.toLowerCase().contains(kw))
-                        || (hoTen != null && hoTen.toLowerCase().contains(kw));
-                if (!khop) continue;
-            }
-            ketQua.add(h);
-        }
-        return ketQua;
-    }
-
-    /** Xóa hóa đơn chỉ khi còn ở trạng thái NHAP. */
     public void xoa(String maHoaDon) {
-        TransactionManager transactionManager = new TransactionManager();
+        TransactionManager tm = new TransactionManager();
+
         try {
-            transactionManager.begin();
-            EntityManager em = transactionManager.getEntityManager();
-            HoaDon hoaDon = hoaDonDAO.findById(em, maHoaDon);
-            if (hoaDon == null) throw new IllegalArgumentException("Không tìm thấy hóa đơn: " + maHoaDon);
-            if (hoaDon.getTrangThai() != TrangThaiHoaDon.NHAP) {
-                throw new IllegalStateException("Chỉ hóa đơn NHAP mới được xóa.");
+            tm.begin();
+            EntityManager em = tm.getEntityManager();
+
+            HoaDon hd = hoaDonDAO.findById(em, maHoaDon);
+
+            if (hd == null) {
+                throw new IllegalArgumentException(
+                        "Không tìm thấy hóa đơn: " + maHoaDon);
             }
-            daoDelete(em, hoaDon);
-            transactionManager.commit();
+
+            if (hd.getTrangThai() != TrangThaiHoaDon.NHAP) {
+                throw new IllegalStateException(
+                        "Chỉ hóa đơn NHAP mới được xóa.");
+            }
+
+            hoaDonDAO.delete(em, hd);
+            tm.commit();
+
         } catch (Exception e) {
-            transactionManager.rollback();
+            tm.rollback();
             throw e;
         } finally {
-            transactionManager.close();
+            tm.close();
         }
     }
 
-    private void daoDelete(EntityManager em, HoaDon hoaDon) {
-        hoaDonDAO.delete(em, hoaDon);
-    }
-
-    private void initialize(HoaDon hoaDon) {
-        if (hoaDon == null) return;
-        Hibernate.initialize(hoaDon.getDatPhong());
-        if (hoaDon.getDatPhong() != null) {
-            Hibernate.initialize(hoaDon.getDatPhong().getKhachHang());
+    private void initialize(HoaDon hd) {
+        if (hd == null) {
+            return;
         }
-        Hibernate.initialize(hoaDon.getChiTietHoaDon());
-    }
 
+        Hibernate.initialize(hd.getDatPhong());
+
+        if (hd.getDatPhong() != null) {
+            Hibernate.initialize(
+                    hd.getDatPhong().getKhachHang());
+        }
+
+        Hibernate.initialize(hd.getChiTietHoaDon());
+    }
 }

@@ -21,7 +21,7 @@ public class Phong {
     private String viTri;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trangThai", nullable = false, length = 20)
+    @Column(name = "trangThai", nullable = false, length = 30)
     private TrangThaiPhong trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)

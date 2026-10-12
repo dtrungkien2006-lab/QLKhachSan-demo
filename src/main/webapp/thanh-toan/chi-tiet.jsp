@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
-<head><meta charset="UTF-8"><title>Chi tiết thanh toán</title></head>
+<head><meta charset="UTF-8"><title>Chi tiết thanh toán</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css"></head>
 <body>
 <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
 <h1>Chi tiết thanh toán</h1>
@@ -28,5 +28,5 @@
 </c:if>
 </c:if>
 <p><a href="${pageContext.request.contextPath}/thanh-toan?action=list">← Danh sách thanh toán</a></p>
-</body>
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body>
 </html>

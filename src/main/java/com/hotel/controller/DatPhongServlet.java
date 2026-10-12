@@ -247,18 +247,55 @@ public class DatPhongServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/dat-phong?action=list&success=cancelled");
     }
 
-    // Nhận phòng (TV3 phụ trách) – [master] ghi nhận nhân viên check-in
-    private void checkIn(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        datPhongService.checkIn(required(request, "ma"), currentMaNV(request));
-        response.sendRedirect(request.getContextPath() + "/dat-phong?action=list&success=checkin");
+    
+    /**
+     * Nhận phòng:
+     * 1. Cập nhật trạng thái đặt phòng.
+     * 2. Tạo hóa đơn ngay khi check-in.
+     * 3. Không tạo trùng hóa đơn nếu đã có hóa đơn.
+     */
+    private void checkIn(
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+
+        String maDatPhong = required(request, "ma");
+
+        datPhongService.checkIn(
+                maDatPhong,
+                currentMaNV(request)
+        );
+
+        new com.hotel.service.HoaDonService()
+                .taoHoaDon(maDatPhong);
+
+        response.sendRedirect(
+                request.getContextPath()
+                + "/dat-phong?action=list&success=checkin"
+        );
     }
 
-    // Trả phòng và lập hóa đơn (TV3 và TV5 phụ trách) – [master] ghi nhận nhân viên check-out
-    private void checkOut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        var hoaDon = checkoutService.checkout(required(request, "ma"), currentMaNV(request));
-        response.sendRedirect(request.getContextPath()
-                + "/hoa-don?action=detail&id=" + hoaDon.getMaHoaDon() + "&success=checkout");
+    /**
+     * Trả phòng:
+     * Gọi nghiệp vụ checkout để cập nhật trạng thái phòng,
+     * đặt phòng và hóa đơn.
+     */
+    private void checkOut(
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+
+        String maDatPhong = required(request, "ma");
+
+        checkoutService.checkout(
+                maDatPhong,
+                currentMaNV(request)
+        );
+
+        response.sendRedirect(
+                request.getContextPath()
+                + "/dat-phong?action=list&success=checkout"
+        );
     }
+
 
     /**
      * Đọc các trường gửi lên từ form HTML, kiểm tra dữ liệu bắt buộc và đóng gói vào DTO

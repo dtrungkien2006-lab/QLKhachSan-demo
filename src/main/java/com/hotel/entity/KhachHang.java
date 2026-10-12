@@ -18,7 +18,7 @@ public class KhachHang {
     @Column(name = "hoTen", nullable = false, length = 100)
     private String hoTen;
 
-    @Column(name = "cccd", length = 12, unique = true)
+    @Column(name = "cccd", length = 20, unique = true)
     private String cccd;
 
     @Column(name = "ngaySinh")

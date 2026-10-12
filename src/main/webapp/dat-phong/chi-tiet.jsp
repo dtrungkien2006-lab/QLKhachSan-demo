@@ -5,7 +5,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Chi tiết đặt phòng</title>
+    <title>Chi tiết đặt phòng</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
     <style>
         body { font-family: Arial, sans-serif; max-width: 1100px; margin: 30px auto; }
         table { width:100%; border-collapse:collapse; margin-top:20px; }
@@ -62,5 +62,6 @@
     </c:if>
     </tbody>
 </table>
-</body>
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body>
 </html>
+

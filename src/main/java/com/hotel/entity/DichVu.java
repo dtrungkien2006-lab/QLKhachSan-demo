@@ -17,7 +17,7 @@ public class DichVu {
     @Column(name = "tenDichVu", nullable = false, length = 100)
     private String tenDichVu;
 
-    @Column(name = "moTa", length = 255)
+    @Column(name = "moTa", length = 500)
     private String moTa;
 
     @Column(name = "donGia", nullable = false, precision = 12, scale = 2)

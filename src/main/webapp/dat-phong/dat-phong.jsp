@@ -4,7 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Tạo đặt phòng</title>
+    <title>Tạo đặt phòng</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
     <style>
         body { font-family: Arial, sans-serif; max-width: 1100px; margin: 30px auto; }
         label { display:block; margin-top:12px; font-weight:bold; }
@@ -98,5 +98,8 @@
         <button type="submit">Tạo đặt phòng</button>
     </form>
 </c:if>
-</body>
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body>
 </html>
+
+
+
