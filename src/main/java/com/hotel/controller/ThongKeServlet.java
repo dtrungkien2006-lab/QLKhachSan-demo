@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-/** TV5 - Thống kê: phòng, đặt phòng, khách hàng, doanh thu. URL: /thong-ke */
 @WebServlet("/thong-ke")
 public class ThongKeServlet extends HttpServlet {
 
@@ -27,7 +26,7 @@ public class ThongKeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         LocalDate hienTai = LocalDate.now();
-        LocalDate tu = parse(req.getParameter("tuNgay"), hienTai.minusDays(60));
+        LocalDate tu = parse(req.getParameter("tuNgay"), hienTai.withDayOfMonth(1));
         LocalDate den = parse(req.getParameter("denNgay"), hienTai);
         KieuThoiGian kieu = KieuThoiGian.parse(req.getParameter("kieu"));
         String loai = val(req.getParameter("loai"), "tong-quan");

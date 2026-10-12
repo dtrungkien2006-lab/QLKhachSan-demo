@@ -67,6 +67,18 @@
             icon: '♧',
             href: '/nhan-vien',
             match: p => p.startsWith('/nhan-vien')
+        },
+        {
+            label: 'Báo cáo',
+            icon: '📊',
+            href: '/bao-cao',
+            match: p => p.startsWith('/bao-cao')
+        },
+        {
+            label: 'Thống kê',
+            icon: '📈',
+            href: '/thong-ke',
+            match: p => p.startsWith('/thong-ke')
         }
     ];
 

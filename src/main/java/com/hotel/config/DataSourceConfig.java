@@ -6,21 +6,11 @@ import com.zaxxer.hikari.HikariDataSource;
 public class DataSourceConfig {
 
     private static final HikariDataSource DATA_SOURCE;
-
     static {
         HikariConfig config = new HikariConfig();
-
-        config.setJdbcUrl(getConfig(
-                "DB_URL",
-                "jdbc:mysql://localhost:3306/QLKhachSan"
-                        + "?useSSL=false"
-                        + "&serverTimezone=Asia/Ho_Chi_Minh"
-                        + "&characterEncoding=UTF-8"
-        ));
-
+        config.setJdbcUrl(getConfig("DB_URL", "jdbc:mysql://localhost:3306/QLKhachSan" + "?useSSL=false" + "&serverTimezone=Asia/Ho_Chi_Minh" + "&characterEncoding=UTF-8"));
         config.setUsername(getConfig("DB_USERNAME", "root"));
-        config.setPassword(getConfig("DB_PASSWORD", "123456"));
-
+        config.setPassword(getConfig("DB_PASSWORD", "123123"));
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
         // Connection pool
@@ -37,32 +27,18 @@ public class DataSourceConfig {
         DATA_SOURCE = new HikariDataSource(config);
     }
 
-    private DataSourceConfig() {
-    }
-
+    private DataSourceConfig() {}
     public static HikariDataSource getDataSource() {
         return DATA_SOURCE;
     }
-
     private static String getConfig(String key, String defaultValue) {
         String systemProperty = System.getProperty(key);
-
-        if (systemProperty != null && !systemProperty.isBlank()) {
-            return systemProperty;
-        }
-
+        if (systemProperty != null && !systemProperty.isBlank()) {return systemProperty;}
         String environmentVariable = System.getenv(key);
-
-        if (environmentVariable != null && !environmentVariable.isBlank()) {
-            return environmentVariable;
-        }
-
+        if (environmentVariable != null && !environmentVariable.isBlank()) {return environmentVariable;}
         return defaultValue;
     }
-
     public static void close() {
-        if (DATA_SOURCE != null && !DATA_SOURCE.isClosed()) {
-            DATA_SOURCE.close();
-        }
+        if (DATA_SOURCE != null && !DATA_SOURCE.isClosed()) {DATA_SOURCE.close();}
     }
 }

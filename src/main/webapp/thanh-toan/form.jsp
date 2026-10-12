@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -431,7 +431,7 @@
                                         <c:out value="${hd.datPhong.maDatPhong}"/>
                                         — <fmt:formatNumber
                                             value="${hd.tongTien}"
-                                            pattern="#,##0.00"/> đ
+                                            pattern="#,##0"/> đ
                                     </option>
                                 </c:forEach>
                             </select>
@@ -548,9 +548,8 @@
     const methodSelect = document.getElementById('phuongThuc');
     const summaryMethod = document.getElementById('summaryMethod');
 
-    const moneyFormatter = new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+    const moneyFormatter = new Intl.NumberFormat('vi-VN', {
+        maximumFractionDigits: 0
     });
 
     function updateInvoice() {

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head><meta charset="UTF-8"><title>Chi tiết thanh toán</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css"></head>
@@ -11,7 +12,7 @@
 <table border="1" cellpadding="8" cellspacing="0">
     <tr><th>Mã thanh toán</th><td>${item.maThanhToan}</td></tr>
     <tr><th>Mã đặt phòng</th><td>${item.datPhong.maDatPhong}</td></tr>
-    <tr><th>Số tiền</th><td>${item.soTien}</td></tr>
+    <tr><th>Số tiền</th><td><fmt:formatNumber value="${item.soTien}" type="number" pattern="#,##0" /> ₫</td></tr>
     <tr><th>Phương thức</th><td>${item.phuongThuc}</td></tr>
     <tr><th>Trạng thái</th><td>${item.trangThai}</td></tr>
     <tr><th>Mã giao dịch</th><td>${item.maGiaoDich}</td></tr>
