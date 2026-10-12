@@ -1,22 +1,24 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Quản lý khách sạn</title>
 </head>
 <body>
-<a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
-<h1>Quản lý khách sạn</h1>
-<p>Backend MVC đã sẵn sàng cho module đặt phòng.</p>
-<ul>
-    <li><a href="${pageContext.request.contextPath}/dat-phong?action=list">Danh sách đặt phòng</a></li>
-    <li><a href="${pageContext.request.contextPath}/dat-phong?action=new">Tạo đặt phòng</a></li>
-    <li><a href="${pageContext.request.contextPath}/khach-hang">Khách hàng</a></li>
-    <li><a href="${pageContext.request.contextPath}/hoa-don?action=list">Hóa đơn</a></li>
-    <li><a href="${pageContext.request.contextPath}/thong-ke">Thống kê (có biểu đồ)</a></li>
-    <li><a href="${pageContext.request.contextPath}/bao-cao">Báo cáo (có biểu đồ)</a></li>
-</ul>
+    <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
+
+    <h1>Quản lý khách sạn</h1>
+    <p>Backend MVC đã sẵn sàng cho module đặt phòng.</p>
+
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/dat-phong">Danh sách đặt phòng</a></li>
+        <li><a href="${pageContext.request.contextPath}/dat-phong?action=new">Tạo đặt phòng</a></li>
+        <li><a href="${pageContext.request.contextPath}/loai-phong">Quản lý loại phòng</a></li>
+        <li><a href="${pageContext.request.contextPath}/phong">Quản lý phòng </a></li>
+        <li><a href="${pageContext.request.contextPath}/khach-hang">Khách hàng</a></li>
+        <li><a href="${pageContext.request.contextPath}/hoa-don">Hóa đơn</a></li>
+        <li><a href="${pageContext.request.contextPath}/thong-ke">Thống kê </a></li>
+        <li><a href="${pageContext.request.contextPath}/bao-cao">Báo cáo </a></li>
+    </ul>
 </body>
 </html>
-
