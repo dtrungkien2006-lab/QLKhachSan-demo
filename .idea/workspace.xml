@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="QLKhachSan:war exploded" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4f1cc166-5b20-4301-8323-0750af45736a" name="Changes" comment="refactor(tv2): bỏ bộ lọc giá ở trang tạo đặt phòng&#10;&#10;- Xóa ô giá từ / giá đến vì mỗi loại phòng chỉ có một mức giá,&#10;  lọc theo loại phòng đã đủ; giá vẫn hiển thị ở cột Giá cơ bản&#10;- Servlet không còn đọc tham số giaTu, giaDen">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hotel/config/DataSourceConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hotel/config/DataSourceConfig.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Jsp File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/master" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;dtrungkien2006-lab&quot;
+  }
+}</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="a8d3da15-3dde-44be-b4a0-d600adb7fc52" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/nguyendinhalam-cmyk/Web-HotelManagement.git&quot;,
+    &quot;accountId&quot;: &quot;a8d3da15-3dde-44be-b4a0-d600adb7fc52&quot;
+  }
+}</component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0001614326322577" />
+      <entry key="S2" value="1.1708057020451643" />
+      <entry key="S5" value="1.9052089338869878" />
+      <entry key="S10" value="2.82572623139992" />
+      <entry key="S30" value="4.390591448826259" />
+      <entry key="S60" value="5.085653702052666" />
+      <entry key="M2" value="5.510722988923205" />
+      <entry key="M5" value="5.795896575395323" />
+      <entry key="M10" value="5.901654419085869" />
+      <entry key="M15" value="5.96835419645671" />
+      <entry key="M30" value="6.239730085763627" />
+      <entry key="H1" value="6.72356391898448" />
+      <entry key="H2" value="7.208648329757606" />
+      <entry key="H4" value="7.556002868471892" />
+      <entry key="D1" value="7.918218484000193" />
+      <entry key="W1" value="7.988110607372692" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.3889422896986539E-28" />
+      <entry key="MS500" value="2.682520315311343E-6" />
+      <entry key="S2" value="0.04377349256813419" />
+      <entry key="S5" value="0.48033974527911594" />
+      <entry key="S10" value="1.4702422944344364" />
+      <entry key="S30" value="3.6290427272745927" />
+      <entry key="S60" value="4.6466361513526815" />
+      <entry key="M2" value="5.274609534919672" />
+      <entry key="M5" value="5.697158771585089" />
+      <entry key="M10" value="5.846376028606912" />
+      <entry key="M15" value="5.897087539931969" />
+      <entry key="M30" value="5.94829379571969" />
+      <entry key="H1" value="5.974084076803694" />
+      <entry key="H2" value="5.987026292003515" />
+      <entry key="H4" value="5.993509204247993" />
+      <entry key="D1" value="5.99891765280415" />
+      <entry key="W1" value="5.99984536554825" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.4532480259677539E-10" />
+      <entry key="MS500" value="0.010785058715902372" />
+      <entry key="S2" value="0.44733879454749015" />
+      <entry key="S5" value="1.7497485655505545" />
+      <entry key="S10" value="3.7099850714824303" />
+      <entry key="S30" value="7.5965327187810345" />
+      <entry key="S60" value="9.457669302608847" />
+      <entry key="M2" value="10.627198292104381" />
+      <entry key="M5" value="11.423975796824251" />
+      <entry key="M10" value="11.712437749804415" />
+      <entry key="M15" value="11.841458578564938" />
+      <entry key="M30" value="12.175855641925317" />
+      <entry key="H1" value="12.691479043272523" />
+      <entry key="H2" value="13.192554863797112" />
+      <entry key="H4" value="13.54794035140324" />
+      <entry key="D1" value="13.916872189561534" />
+      <entry key="W1" value="13.987918212009404" />
+    </decayedShown>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="Security Analysis" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3KEg99aNBfJrfH8RXbpkEape4oO" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Maven.QLKhachSan [clean].executor": "Run",
+    "Maven.QLKhachSan [package].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Smart Tomcat.Unnamed.executor": "Run",
+    "Tomcat Server.Tomcat 10.1.60.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "master",
+    "git.auto.fetch.suggestion.counter": "2",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Admin/Downloads/QLKhachSan/qlks/pom.xml",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory">
+          <value>
+            <map>
+              <entry key="Tomcat 10.1.60" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Tomcat 10.1.60" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.60" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="$USER_HOME$/.jdks/corretto-17.0.20.1" nameIsGenerated="true">
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment>
+        <artifact name="QLKhachSan:war exploded">
+          <settings>
+            <option name="CONTEXT_PATH" value="/QLKhachSan_war_exploded" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="48f35767-5a9e-414a-952a-1de5906708d2" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="56660" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="QLKhachSan:war exploded" />
+        </option>
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-34e2839f716b-intellij.indexing.shared.core-IU-262.9437.185" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.9437.185" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4f1cc166-5b20-4301-8323-0750af45736a" name="Changes" comment="" />
+      <created>1791127987978</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1791127987978</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: cập nhật PhongDAO xử lý phòng trống và bộ lọc phòng&#10;Nội dung chính:&#10;- Bỏ qua booking DA_HUY, DA_TRA_PHONG khi kiểm tra phòng trống.&#10;- Thêm tìm phòng theo loại phòng.&#10;- Thêm lọc theo khoảng giá.&#10;- Thêm lọc theo trạng thái phòng." />
+    <MESSAGE value="feat: bổ sung service tìm phòng trống có bộ lọc&#10;Nội dung chính:&#10;- Thêm overload findPhongCoTheDat() nhận điều kiện lọc.&#10;- Kết nối PhongService với logic lọc mới của PhongDAO.&#10;- Giữ nguyên hàm tìm phòng trống cũ để không phá code hiện tại." />
+    <MESSAGE value="feat: hoàn thiện luồng đặt phòng và tra cứu đặt phòng&#10;Nội dung chính:&#10;Kết nối bộ lọc phòng trống với giao diện đặt phòng.&#10;Nhận và kiểm tra số lượng khách.&#10;Thêm tra cứu đặt phòng theo mã, khách hàng, trạng thái và ngày.&#10;Thêm xem chi tiết đặt phòng.&#10;Bổ sung xử lý lỗi ngày tháng và tham số đầu vào." />
+    <MESSAGE value="feat: bổ sung kiểm tra đặt phòng và quản lý trạng thái phòng&#10;Nội dung chính:&#10;Thêm kiểm tra số lượng khách theo sức chứa phòng.&#10;Không cho hủy booking khi khách đang ở.&#10;Khi hủy chỉ trả phòng về TRONG nếu không còn booking khác giữ phòng.&#10;Chỉ chuyển phòng TRONG → DA_DAT khi tạo booking.&#10;Thêm kiểm tra ghi chú tối đa 500 ký tự.&#10;Thêm tra cứu và xem chi tiết đặt phòng." />
+    <MESSAGE value="feat: cập nhật kiểm tra trùng lịch và trạng thái giữ phòng&#10;Bỏ qua DA_HUY, DA_TRA_PHONG khi kiểm tra overlap.&#10;Thêm kiểm tra booking khác còn giữ phòng khi hủy." />
+    <MESSAGE value="feat: bổ sung tra cứu và xem chi tiết đặt phòng&#10;Thêm traCuu().&#10;Thêm findByIdWithChiTiet().&#10;Hỗ trợ tìm theo mã đặt phòng, khách hàng, trạng thái và ngày." />
+    <MESSAGE value="feat: bổ sung dữ liệu số lượng khách cho form đặt phòng&#10;Thêm soLuongKhach.&#10;Giữ danh sách chi tiết phòng và ngày nhận/trả." />
+    <MESSAGE value="feat: bổ sung sức chứa phòng vào DTO&#10;Thêm soNguoiToiDa.&#10;Phục vụ hiển thị/kiểm tra sức chứa khi đặt phòng." />
+    <MESSAGE value="feat(tv2): bổ sung giao diện lọc phòng, tra cứu và chi tiết đặt phòng&#10;&#10;- dat-phong.jsp: thêm bộ lọc loại phòng, giá, tình trạng phòng;&#10;  thêm ô số lượng khách, cột sức chứa; giới hạn ghi chú 500 ký tự&#10;- danh-sach.jsp: thêm form tra cứu theo mã đặt phòng, tên/SĐT khách,&#10;  trạng thái, khoảng ngày nhận; thêm link xem chi tiết&#10;- chi-tiet.jsp (mới): hiển thị các phòng trong đặt phòng,&#10;  ngày nhận/trả và giá đã chốt" />
+    <MESSAGE value="fix(tv2): chỉnh bộ lọc kiểm tra phòng trống theo góp ý&#10;&#10;- Ô tình trạng phòng chỉ còn Trống / Đã đặt, hiển thị tiếng Việt&#10;- Hiển thị thông báo khi không còn phòng trống phù hợp&#10;- Ô giá từ / giá đến tăng giảm theo bước 100.000đ" />
+    <MESSAGE value="refactor(tv2): bỏ lọc tình trạng phòng, hiển thị trạng thái đặt phòng tiếng Việt&#10;&#10;- Tạo đặt phòng: bỏ ô lọc tình trạng phòng hiện tại vì danh sách&#10;  đã là phòng trống theo khoảng ngày&#10;- Danh sách, tra cứu và chi tiết đặt phòng: hiển thị trạng thái tiếng Việt" />
+    <MESSAGE value="refactor(tv2): bỏ bộ lọc giá ở trang tạo đặt phòng&#10;&#10;- Xóa ô giá từ / giá đến vì mỗi loại phòng chỉ có một mức giá,&#10;  lọc theo loại phòng đã đủ; giá vẫn hiển thị ở cột Giá cơ bản&#10;- Servlet không còn đọc tham số giaTu, giaDen" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor(tv2): bỏ bộ lọc giá ở trang tạo đặt phòng&#10;&#10;- Xóa ô giá từ / giá đến vì mỗi loại phòng chỉ có một mức giá,&#10;  lọc theo loại phòng đã đủ; giá vẫn hiển thị ở cột Giá cơ bản&#10;- Servlet không còn đọc tham số giaTu, giaDen" />
+  </component>
+</project>

@@ -10,7 +10,7 @@ public class DataSourceConfig {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(getConfig("DB_URL", "jdbc:mysql://localhost:3306/QLKhachSan" + "?useSSL=false" + "&serverTimezone=Asia/Ho_Chi_Minh" + "&characterEncoding=UTF-8"));
         config.setUsername(getConfig("DB_USERNAME", "root"));
-        config.setPassword(getConfig("DB_PASSWORD", "123123"));
+        config.setPassword(getConfig("DB_PASSWORD", "123456"));
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
         // Connection pool
