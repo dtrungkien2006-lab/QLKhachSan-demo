@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Đăng nhập | Horizon Hotel</title>
+    <title>Đăng nhập | UTE Hotel</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
@@ -20,10 +20,10 @@
     <section class="login-side">
 
         <div class="brand">
-            <span class="brand-mark">H</span>
+            <span class="brand-mark"></span>
 
             <span>
-                <span class="brand-name">Horizon Hotel</span>
+                <span class="brand-name">UTE Hotel</span>
                 <br>
                 <span class="brand-sub">HOTEL MANAGEMENT</span>
             </span>
