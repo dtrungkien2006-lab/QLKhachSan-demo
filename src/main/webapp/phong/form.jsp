@@ -14,7 +14,7 @@
 
     <style>
         .wrap {
-            max-width: 1250px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 28px;
         }
@@ -39,17 +39,6 @@
             border-radius: 14px;
         }
 
-        .form-grid input,
-        .form-grid select,
-        .form-grid textarea {
-            box-sizing: border-box;
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #d8e0ea;
-            border-radius: 8px;
-            font: inherit;
-        }
-
         .field {
             display: flex;
             flex-direction: column;
@@ -61,6 +50,16 @@
             font-weight: 500;
         }
 
+        .field input,
+        .field select {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d8e0ea;
+            border-radius: 8px;
+            font: inherit;
+        }
+
         .actions {
             display: flex;
             align-items: center;
@@ -70,6 +69,10 @@
 
         .full-width {
             grid-column: 1 / -1;
+        }
+
+        .muted {
+            color: #718096;
         }
 
         @media (max-width: 650px) {
@@ -92,76 +95,82 @@
 <body>
 <main class="wrap">
 
-    <!-- Tiêu đề và điều hướng -->
     <div class="bar">
         <div>
             <div class="eyebrow">QLKhachSan / Quản lý</div>
 
             <h1 style="font-size: 25px; margin: 5px 0;">
-                Thông tin phòng
+                <c:choose>
+                    <c:when test="${formAction eq 'sua'}">
+                        Cập nhật phòng
+                    </c:when>
+                    <c:otherwise>
+                        Thêm phòng mới
+                    </c:otherwise>
+                </c:choose>
             </h1>
 
             <p class="muted">
-                Quản lý dữ liệu kết nối với cơ sở dữ liệu khách sạn.
+                Nhập thông tin phòng khách sạn.
             </p>
         </div>
 
         <div class="actions">
             <a class="btn"
-               href="${pageContext.request.contextPath}/">
-                ← Dashboard
-            </a>
-
-            <a class="btn btn-primary"
-               href="${pageContext.request.contextPath}/phong?action=new">
-                ＋ Thêm mới
+               href="${pageContext.request.contextPath}/phong">
+                ← Quay lại danh sách
             </a>
         </div>
     </div>
 
-    <!-- Thông báo lỗi -->
     <c:if test="${not empty error}">
         <div class="error">
             <c:out value="${error}"/>
         </div>
     </c:if>
 
-    <!-- Form thêm mới hoặc cập nhật phòng -->
     <form class="form-grid"
           method="post"
           action="${pageContext.request.contextPath}/phong">
 
-        <!-- Mã phòng -->
+        <!-- Xác định rõ thao tác thêm hay sửa -->
+        <input type="hidden"
+               name="action"
+               value="${formAction eq 'sua' ? 'sua' : 'them'}">
+
+        <!-- Giữ mã phòng ban đầu khi sửa -->
+        <c:if test="${formAction eq 'sua'}">
+            <input type="hidden"
+                   name="maPhongCu"
+                   value="${item.maPhong}">
+        </c:if>
+
         <label class="field">
-            <span>Mã phòng (để trống khi thêm mới)</span>
+            <span>Mã phòng</span>
 
             <input type="text"
                    name="maPhong"
-                   value="${item.maPhong}"
-                   placeholder="P101">
+                   value="<c:out value='${item.maPhong}'/>"
+                   <c:if test="${formAction eq 'sua'}">readonly</c:if>>
         </label>
 
-        <!-- Số phòng -->
         <label class="field">
             <span>Số phòng</span>
 
             <input type="text"
                    name="soPhong"
-                   value="${item.soPhong}"
+                   value="<c:out value='${item.soPhong}'/>"
                    required>
         </label>
 
-        <!-- Vị trí -->
         <label class="field">
             <span>Vị trí</span>
 
             <input type="text"
                    name="viTri"
-                   value="${item.viTri}"
-                   placeholder="Tầng 1">
+                   value="<c:out value='${item.viTri}'/>">
         </label>
 
-        <!-- Loại phòng -->
         <label class="field">
             <span>Loại phòng</span>
 
@@ -170,32 +179,40 @@
 
                 <c:forEach var="lp" items="${loaiPhongs}">
                     <option value="${lp.maLoaiPhong}"
-                        ${item.loaiPhong.maLoaiPhong == lp.maLoaiPhong
-                            ? 'selected' : ''}>
+                        <c:if test="${item.loaiPhong.maLoaiPhong eq lp.maLoaiPhong}">
+                            selected
+                        </c:if>>
                         <c:out value="${lp.tenLoaiPhong}"/>
                     </option>
                 </c:forEach>
             </select>
         </label>
 
-        <!-- Trạng thái phòng -->
         <label class="field">
-            <span>Trạng thái</span>
+            <span>Trạng thái phòng</span>
 
-            <select name="trangThai">
+            <select name="trangThai" required>
                 <c:forEach var="s" items="${trangThais}">
                     <option value="${s}"
-                        ${item.trangThai == s ? 'selected' : ''}>
+                        <c:if test="${item.trangThai eq s}">
+                            selected
+                        </c:if>>
                         <c:out value="${s}"/>
                     </option>
                 </c:forEach>
             </select>
         </label>
 
-        <!-- Nút thao tác -->
         <div class="actions full-width">
             <button class="btn btn-primary" type="submit">
-                Lưu phòng
+                <c:choose>
+                    <c:when test="${formAction eq 'sua'}">
+                        Lưu thay đổi
+                    </c:when>
+                    <c:otherwise>
+                        Thêm phòng
+                    </c:otherwise>
+                </c:choose>
             </button>
 
             <a class="btn"
@@ -205,6 +222,7 @@
         </div>
 
     </form>
+
 </main>
 
 <script src="${pageContext.request.contextPath}/js/shared-layout.js"

@@ -14,7 +14,7 @@
 
     <style>
         .wrap {
-            max-width: 1250px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 28px;
         }
@@ -28,10 +28,37 @@
             margin-bottom: 20px;
         }
 
+        .panel {
+            max-width: 780px;
+            padding: 24px;
+            background: #fff;
+            border: 1px solid #e5eaf1;
+            border-radius: 14px;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 160px minmax(0, 1fr);
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .detail-label {
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            overflow-wrap: anywhere;
+        }
+
         .actions {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 10px;
             flex-wrap: wrap;
+            margin-top: 22px;
         }
 
         .muted {
@@ -42,6 +69,15 @@
             .wrap {
                 padding: 15px;
             }
+
+            .panel {
+                padding: 18px;
+            }
+
+            .detail-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -49,74 +85,98 @@
 <body>
 <main class="wrap">
 
-    <!-- Tiêu đề và điều hướng -->
     <div class="bar">
         <div>
             <div class="eyebrow">QLKhachSan / Quản lý</div>
 
-            <h1 style="font-size: 25px; margin: 5px 0;">
+            <h1 style="font-size:25px; margin:5px 0;">
                 Chi tiết phòng
             </h1>
 
             <p class="muted">
-                Quản lý dữ liệu kết nối với cơ sở dữ liệu khách sạn.
+                Thông tin chi tiết phòng khách sạn.
             </p>
         </div>
 
-        <div class="actions">
-            <a class="btn"
-               href="${pageContext.request.contextPath}/">
-                ← Dashboard
-            </a>
-
-            <a class="btn btn-primary"
-               href="${pageContext.request.contextPath}/phong?action=new">
-                ＋ Thêm mới
-            </a>
-        </div>
+        <a class="btn"
+           href="${pageContext.request.contextPath}/phong">
+            ← Danh sách phòng
+        </a>
     </div>
 
-    <!-- Thông báo lỗi -->
     <c:if test="${not empty error}">
         <div class="error">
             <c:out value="${error}"/>
         </div>
     </c:if>
 
-    <!-- Thông tin chi tiết phòng -->
-    <div class="panel">
+    <c:choose>
+        <c:when test="${not empty item}">
+            <div class="panel">
 
-        <p>
-            <b>Mã phòng:</b>
-            <c:out value="${item.maPhong}"/>
-        </p>
+                <div class="detail-row">
+                    <div class="detail-label">Mã phòng</div>
+                    <div class="detail-value">
+                        <c:out value="${item.maPhong}"/>
+                    </div>
+                </div>
 
-        <p>
-            <b>Số phòng:</b>
-            <c:out value="${item.soPhong}"/>
-        </p>
+                <div class="detail-row">
+                    <div class="detail-label">Số phòng</div>
+                    <div class="detail-value">
+                        <strong>
+                            <c:out value="${item.soPhong}"/>
+                        </strong>
+                    </div>
+                </div>
 
-        <p>
-            <b>Vị trí:</b>
-            <c:out value="${item.viTri}"/>
-        </p>
+                <div class="detail-row">
+                    <div class="detail-label">Vị trí</div>
+                    <div class="detail-value">
+                        <c:out value="${item.viTri}"/>
+                    </div>
+                </div>
 
-        <p>
-            <b>Loại phòng:</b>
-            <c:out value="${item.loaiPhong.tenLoaiPhong}"/>
-        </p>
+                <div class="detail-row">
+                    <div class="detail-label">Loại phòng</div>
+                    <div class="detail-value">
+                        <c:out value="${item.loaiPhong.tenLoaiPhong}"/>
+                    </div>
+                </div>
 
-        <p>
-            <b>Trạng thái:</b>
-            <c:out value="${item.trangThai}"/>
-        </p>
+                <div class="detail-row">
+                    <div class="detail-label">Trạng thái</div>
+                    <div class="detail-value">
+                        <c:out value="${item.trangThai}"/>
+                    </div>
+                </div>
 
-        <a class="btn"
-           href="${pageContext.request.contextPath}/phong">
-            Quay lại
-        </a>
+                <div class="actions">
+                    <a class="btn btn-primary"
+                       href="${pageContext.request.contextPath}/phong?action=edit&amp;id=${item.maPhong}">
+                        Sửa phòng
+                    </a>
 
-    </div>
+                    <a class="btn"
+                       href="${pageContext.request.contextPath}/phong">
+                        Quay lại
+                    </a>
+                </div>
+
+            </div>
+        </c:when>
+
+        <c:otherwise>
+            <div class="panel">
+                <p>Không có dữ liệu phòng để hiển thị.</p>
+
+                <a class="btn"
+                   href="${pageContext.request.contextPath}/phong">
+                    Quay lại danh sách phòng
+                </a>
+            </div>
+        </c:otherwise>
+    </c:choose>
 
 </main>
 
