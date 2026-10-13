@@ -1,4 +1,3 @@
-
 package com.hotel.controller;
 
 import com.hotel.entity.HoaDon;
@@ -24,7 +23,11 @@ public class ThanhToanServlet extends HttpServlet {
     private HoaDonService hoaDonService;
 
     @Override
-    public void init() {service = new ThanhToanService();datPhongService = new DatPhongService();hoaDonService = new HoaDonService();}
+    public void init() {
+        service = new ThanhToanService();
+        datPhongService = new DatPhongService();
+        hoaDonService = new HoaDonService();
+    }
 
     @Override
     protected void doGet(HttpServletRequest r, HttpServletResponse p)
@@ -56,11 +59,12 @@ public class ThanhToanServlet extends HttpServlet {
             x.setMaThanhToan(r.getParameter("maThanhToan"));
             HoaDon hd = hoaDonService.findById(req(r, "maHoaDon"));
 
-            if (hd == null) {throw new IllegalArgumentException("Không tìm thấy hóa đơn.");}
+            if (hd == null) {
+                throw new IllegalArgumentException("Không tìm thấy hóa đơn.");
+            }
 
             x.setDatPhong(hd.getDatPhong());
             x.setSoTien(hd.getTongTien());
-
             x.setPhuongThuc(en(PhuongThucThanhToan.class, req(r, "phuongThuc")));
 
             service.taoThanhToan(x);
@@ -69,29 +73,24 @@ public class ThanhToanServlet extends HttpServlet {
         } catch (IllegalArgumentException | IllegalStateException e) {
             r.setAttribute("error", e.getMessage());
             form(r, p);
-            r.setAttribute("error", e.getMessage());
         }
     }
 
     private void success(HttpServletRequest r, HttpServletResponse p)
             throws IOException {
-
         service.thanhToanThanhCong(req(r, "id"), r.getParameter("maGiaoDich"));
         p.sendRedirect(r.getContextPath() + "/thanh-toan?action=list&success=paid");
     }
 
     private void fail(HttpServletRequest r, HttpServletResponse p)
             throws IOException {
-
         service.thanhToanThatBai(req(r, "id"), r.getParameter("maGiaoDich"));
         p.sendRedirect(r.getContextPath() + "/thanh-toan?action=list&success=failed");
     }
 
     private void refund(HttpServletRequest r, HttpServletResponse p)
             throws IOException {
-
         service.hoanTien(req(r, "id"));
-
         p.sendRedirect(r.getContextPath() + "/thanh-toan?action=list&success=refunded");
     }
 
@@ -103,14 +102,13 @@ public class ThanhToanServlet extends HttpServlet {
 
     private void list(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
-
         r.setAttribute("items", service.findAll());
         r.getRequestDispatcher("/thanh-toan/danh-sach.jsp").forward(r, p);
     }
 
     private void form(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
-
+        // Ưu tiên dùng findChuaThanhToan() từ nhánh UI-và-Dịch-vụ,-Hóa-Đơn để form tạo thanh toán hợp lý hơn
         r.setAttribute("hoaDons", hoaDonService.findChuaThanhToan());
         r.setAttribute("phuongThucs", PhuongThucThanhToan.values());
         r.getRequestDispatcher("/thanh-toan/form.jsp").forward(r, p);
@@ -118,21 +116,27 @@ public class ThanhToanServlet extends HttpServlet {
 
     private void detail(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
-
         ThanhToan x = service.findById(req(r, "id"));
-        if (x == null) {throw new IllegalArgumentException("Không tìm thấy thanh toán.");}
+        if (x == null) {
+            throw new IllegalArgumentException("Không tìm thấy thanh toán.");
+        }
         r.setAttribute("item", x);
         r.getRequestDispatcher("/thanh-toan/chi-tiet.jsp").forward(r, p);
     }
 
     private static String req(HttpServletRequest r, String n) {
         String x = r.getParameter(n);
-        if (x == null || x.isBlank()) {throw new IllegalArgumentException("Thiếu tham số: " + n);}
+        if (x == null || x.isBlank()) {
+            throw new IllegalArgumentException("Thiếu tham số: " + n);
+        }
         return x.trim();
     }
 
     private static String v(String x, String f) {
         return x == null || x.isBlank() ? f : x;
     }
-    private static <E extends Enum<E>> E en(Class<E> c, String x) {return Enum.valueOf(c, x);}
+
+    private static <E extends Enum<E>> E en(Class<E> c, String x) {
+        return Enum.valueOf(c, x);
+    }
 }

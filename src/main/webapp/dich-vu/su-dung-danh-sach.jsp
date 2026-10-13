@@ -19,10 +19,9 @@
             <p class="muted">Quản lý dữ liệu kết nối với cơ sở dữ liệu khách sạn.</p>
         </div>
         <div class="actions">
-            <a class="btn btn-primary"
-                href="${pageContext.request.contextPath}/hoa-don">
-                 Chi tiết hóa đơn
-             </a>
+            <!-- Giữ lại cả 2 nút từ cả 2 nhánh cho tiện điều hướng -->
+            <a class="btn" href="${pageContext.request.contextPath}/">← Dashboard</a>
+            <a class="btn" href="${pageContext.request.contextPath}/hoa-don">Chi tiết hóa đơn</a>
             <a class="btn btn-primary" href="${pageContext.request.contextPath}/su-dung-dich-vu?action=new">＋ Thêm mới</a>
         </div>
     </div>
