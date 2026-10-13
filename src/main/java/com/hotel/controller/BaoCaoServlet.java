@@ -8,15 +8,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-/**
- * TV5 - Báo cáo: doanh thu, sử dụng phòng, đặt phòng, lưu trú.
- * URL: /bao-cao?loai=...&tuNgay=...&denNgay=...&kieu=...[&format=csv]
- */
 @WebServlet("/bao-cao")
 public class BaoCaoServlet extends HttpServlet {
 
@@ -31,7 +26,7 @@ public class BaoCaoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         LocalDate hienTai = LocalDate.now();
-        LocalDate tu = parse(req.getParameter("tuNgay"), hienTai.minusDays(60));
+        LocalDate tu = parse(req.getParameter("tuNgay"), hienTai.withDayOfMonth(1));
         LocalDate den = parse(req.getParameter("denNgay"), hienTai);
         KieuThoiGian kieu = KieuThoiGian.parse(req.getParameter("kieu"));
         String loai = val(req.getParameter("loai"), BaoCaoService.DOANH_THU);

@@ -23,17 +23,24 @@ public class NhanVienServlet extends HttpServlet {
     private TaiKhoanService taiKhoanService;
 
     @Override
-    public void init() {
-        this.nhanVienService = new NhanVienService();
-        this.taiKhoanService = new TaiKhoanService();
+    public void init() {this.nhanVienService = new NhanVienService();this.taiKhoanService = new TaiKhoanService();}
+
+    private boolean kiemTraQuyenAdmin(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        if (PhanQuyen.laAdmin(req)) {return true;}
+
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền quản lý nhân viên và tài khoản.");
+        return false;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
-        String action = getOrDefault(req.getParameter("action"), "list");
 
+        req.setCharacterEncoding("UTF-8");
+        if (!kiemTraQuyenAdmin(req, resp)) {return;}
+        String action = getOrDefault(req.getParameter("action"), "list");
         try {
             switch (action) {
                 case "new" -> renderForm(req, resp, null);
@@ -53,9 +60,10 @@ public class NhanVienServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
-        String action = getOrDefault(req.getParameter("action"), "save");
 
+        req.setCharacterEncoding("UTF-8");
+        if (!kiemTraQuyenAdmin(req, resp)) {return;}
+        String action = getOrDefault(req.getParameter("action"), "save");
         try {
             switch (action) {
                 case "save" -> handleSaveNhanVien(req, resp);
@@ -71,9 +79,10 @@ public class NhanVienServlet extends HttpServlet {
 
     private void handleSaveNhanVien(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        String maNV = trimToNull(req.getParameter("maNV"));
 
+        String maNV = trimToNull(req.getParameter("maNV"));
         NhanVien nhanVien = new NhanVien();
+
         nhanVien.setMaNV(maNV);
         nhanVien.setHoTen(getRequiredParam(req, "hoTen"));
         nhanVien.setNgaySinh(parseDate(req.getParameter("ngaySinh")));
@@ -89,44 +98,36 @@ public class NhanVienServlet extends HttpServlet {
             if (!matKhau.equals(confirmMatKhau)) {
                 throw new IllegalArgumentException("Mật khẩu xác nhận không khớp.");
             }
-
             VaiTro vaiTro = parseEnum(VaiTro.class, getRequiredParam(req, "vaiTro"));
             nhanVienService.taoNhanVienVaTaiKhoan(nhanVien, matKhau, vaiTro);
         } else {
             nhanVienService.capNhatThongTin(nhanVien);
         }
-
         redirectToSuccess(req, resp, "saved");
     }
 
     private void handleToggleAccountStatus(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
+
         String maNV = getRequiredParam(req, "id");
         var taiKhoan = taiKhoanService.findByMaNV(maNV);
+        if (taiKhoan == null) {throw new IllegalArgumentException("Nhân viên chưa có tài khoản.");}
 
-        if (taiKhoan == null) {
-            throw new IllegalArgumentException("Nhân viên chưa có tài khoản.");
-        }
-
-        TrangThaiTaiKhoan nextStatus = (taiKhoan.getTrangThai() == TrangThaiTaiKhoan.HOAT_DONG)
-                ? TrangThaiTaiKhoan.KHOA
-                : TrangThaiTaiKhoan.HOAT_DONG;
-
+        TrangThaiTaiKhoan nextStatus = taiKhoan.getTrangThai() == TrangThaiTaiKhoan.HOAT_DONG ? TrangThaiTaiKhoan.KHOA : TrangThaiTaiKhoan.HOAT_DONG;
         taiKhoanService.doiTrangThai(maNV, nextStatus);
         redirectToSuccess(req, resp, "status");
     }
 
     private void handleChangeRole(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
+
         String maNV = getRequiredParam(req, "maNV");
         VaiTro vaiTro = parseEnum(VaiTro.class, getRequiredParam(req, "vaiTro"));
-
         taiKhoanService.doiVaiTro(maNV, vaiTro);
         redirectToSuccess(req, resp, "saved");
     }
 
-    private void handleChangePassword(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+    private void handleChangePassword(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String maNV = getRequiredParam(req, "maNV");
         String matKhauMoi = getRequiredParam(req, "matKhauMoi");
 
@@ -136,6 +137,7 @@ public class NhanVienServlet extends HttpServlet {
 
     private void renderList(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         req.setAttribute("items", nhanVienService.findAll());
         req.setAttribute("taiKhoanService", taiKhoanService);
         req.getRequestDispatcher("/nhan-vien/danh-sach.jsp").forward(req, resp);
@@ -143,6 +145,7 @@ public class NhanVienServlet extends HttpServlet {
 
     private void renderForm(HttpServletRequest req, HttpServletResponse resp, NhanVien nhanVien)
             throws ServletException, IOException {
+
         req.setAttribute("mode", nhanVien == null ? "new" : "edit");
         req.setAttribute("item", nhanVien);
         req.setAttribute("gioiTinhs", GioiTinh.values());
@@ -152,12 +155,10 @@ public class NhanVienServlet extends HttpServlet {
 
     private void renderDetail(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         String id = getRequiredParam(req, "id");
         NhanVien nhanVien = nhanVienService.findById(id);
-
-        if (nhanVien == null) {
-            throw new IllegalArgumentException("Không tìm thấy nhân viên.");
-        }
+        if (nhanVien == null) {throw new IllegalArgumentException("Không tìm thấy nhân viên.");}
 
         req.setAttribute("item", nhanVien);
         req.setAttribute("taiKhoan", taiKhoanService.findByMaNV(nhanVien.getMaNV()));
@@ -166,49 +167,44 @@ public class NhanVienServlet extends HttpServlet {
 
     private void renderChangeRoleForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         String id = getRequiredParam(req, "id");
-        req.setAttribute("item", nhanVienService.findById(id));
+        NhanVien nhanVien = nhanVienService.findById(id);
+
+        if (nhanVien == null) {throw new IllegalArgumentException("Không tìm thấy nhân viên.");}
+
+        req.setAttribute("item", nhanVien);
         req.setAttribute("vaiTros", VaiTro.values());
         req.getRequestDispatcher("/nhan-vien/doi-vai-tro.jsp").forward(req, resp);
     }
 
     private void renderChangePasswordForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         String id = getRequiredParam(req, "id");
-        req.setAttribute("item", nhanVienService.findById(id));
+        NhanVien nhanVien = nhanVienService.findById(id);
+        if (nhanVien == null) {throw new IllegalArgumentException("Không tìm thấy nhân viên.");}
+        req.setAttribute("item", nhanVien);
         req.getRequestDispatcher("/nhan-vien/doi-mat-khau.jsp").forward(req, resp);
     }
 
     private static void redirectToSuccess(HttpServletRequest req, HttpServletResponse resp, String resultKey)
             throws IOException {
+
         resp.sendRedirect(req.getContextPath() + "/nhan-vien?action=list&success=" + resultKey);
     }
 
     private static String getRequiredParam(HttpServletRequest req, String paramName) {
+
         String value = req.getParameter(paramName);
-        if (isBlank(value)) {
-            throw new IllegalArgumentException("Thiếu tham số bắt buộc: " + paramName);
-        }
+
+        if (isBlank(value)) {throw new IllegalArgumentException("Thiếu tham số bắt buộc: " + paramName);}
         return value.trim();
     }
 
-    private static String trimToNull(String str) {
-        return isBlank(str) ? null : str.trim();
-    }
-
-    private static boolean isBlank(String str) {
-        return str == null || str.isBlank();
-    }
-
-    private static String getOrDefault(String value, String defaultValue) {
-        return isBlank(value) ? defaultValue : value.trim();
-    }
-
-    private static LocalDate parseDate(String dateStr) {
-        return isBlank(dateStr) ? null : LocalDate.parse(dateStr.trim());
-    }
-
-    private static <E extends Enum<E>> E parseEnum(Class<E> enumClass, String value) {
-        return isBlank(value) ? null : Enum.valueOf(enumClass, value.trim());
-    }
+    private static String trimToNull(String str) {return isBlank(str) ? null : str.trim();}
+    private static boolean isBlank(String str) {return str == null || str.isBlank();}
+    private static String getOrDefault(String value, String defaultValue) {return isBlank(value) ? defaultValue : value.trim();}
+    private static LocalDate parseDate(String dateStr) {return isBlank(dateStr) ? null : LocalDate.parse(dateStr.trim());}
+    private static <E extends Enum<E>> E parseEnum(Class<E> enumClass, String value) {return isBlank(value) ? null : Enum.valueOf(enumClass, value.trim());}
 }

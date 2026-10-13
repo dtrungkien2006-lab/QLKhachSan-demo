@@ -18,26 +18,18 @@ public class TransactionManager {
     }
 
     public void begin() {
-        if (!transaction.isActive()) {
-            transaction.begin();
-        }
+        if (!transaction.isActive()) {transaction.begin();}
     }
 
     public void commit() {
-        if (transaction.isActive()) {
-            transaction.commit();
-        }
+        if (transaction.isActive()) {transaction.commit();}
     }
 
     public void rollback() {
-        if (transaction.isActive()) {
-            transaction.rollback();
-        }
+        if (transaction.isActive()) {transaction.rollback();}
     }
 
     public void close() {
-        if (entityManager.isOpen()) {
-            entityManager.close();
-        }
+        if (entityManager.isOpen()) {entityManager.close();}
     }
 }

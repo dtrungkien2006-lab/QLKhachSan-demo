@@ -20,15 +20,10 @@ public class HoaDonServlet extends HttpServlet {
     private DatPhongService datPhongService;
 
     @Override
-    public void init() {
-        service = new HoaDonService();
-        datPhongService = new DatPhongService();
-    }
+    public void init() {service = new HoaDonService();datPhongService = new DatPhongService();}
 
     @Override
-    protected void doGet(
-            HttpServletRequest r,
-            HttpServletResponse p)
+    protected void doGet(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
 
         String a = v(r.getParameter("action"), "list");
@@ -62,125 +57,55 @@ public class HoaDonServlet extends HttpServlet {
         }
     }
 
-    private void create(
-            HttpServletRequest r,
-            HttpServletResponse p) throws IOException {
-
+    private void create(HttpServletRequest r, HttpServletResponse p) throws IOException {
         HoaDon x = service.taoHoaDon(req(r, "maDatPhong"));
-
-        p.sendRedirect(
-                r.getContextPath()
-                + "/hoa-don?action=detail&id="
-                + x.getMaHoaDon()
-                + "&success=created"
-        );
+        p.sendRedirect(r.getContextPath() + "/hoa-don?action=detail&id=" + x.getMaHoaDon() + "&success=created");
     }
 
-    private void issue(
-            HttpServletRequest r,
-            HttpServletResponse p) throws IOException {
-
+    private void issue(HttpServletRequest r, HttpServletResponse p) throws IOException {
         service.phatHanhHoaDon(req(r, "id"));
-
-        p.sendRedirect(
-                r.getContextPath()
-                + "/hoa-don?action=list&success=issued"
-        );
+        p.sendRedirect(r.getContextPath() + "/hoa-don?action=list&success=issued");
     }
 
-    private void cancel(
-            HttpServletRequest r,
-            HttpServletResponse p) throws IOException {
-
+    private void cancel(HttpServletRequest r, HttpServletResponse p) throws IOException {
         service.huyHoaDon(req(r, "id"));
-
-        p.sendRedirect(
-                r.getContextPath()
-                + "/hoa-don?action=list&success=cancelled"
-        );
+        p.sendRedirect(r.getContextPath() + "/hoa-don?action=list&success=cancelled");
     }
 
-    private void del(
-            HttpServletRequest r,
-            HttpServletResponse p) throws IOException {
-
+    private void del(HttpServletRequest r, HttpServletResponse p) throws IOException {
         service.xoa(req(r, "id"));
-
-        p.sendRedirect(
-                r.getContextPath()
-                + "/hoa-don?action=list&success=deleted"
-        );
+        p.sendRedirect(r.getContextPath() + "/hoa-don?action=list&success=deleted");
     }
 
-    /**
-     * Danh sách hóa đơn cần xử lý:
-     * chỉ hiển thị hóa đơn còn số tiền phải thu.
-     */
-    private void list(
-            HttpServletRequest r,
-            HttpServletResponse p)
+    private void list(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
 
-        r.setAttribute(
-                "items",
-                service.findHoaDonConPhaiThu()
-        );
-
-        r.getRequestDispatcher(
-                "/hoa-don/danh-sach.jsp"
-        ).forward(r, p);
+        r.setAttribute("items", service.findHoaDonConPhaiThu());
+        r.getRequestDispatcher("/hoa-don/danh-sach.jsp").forward(r, p);
     }
 
-    /**
-     * Tra cứu hóa đơn theo đặt phòng.
-     * Giữ nguyên chức năng tra cứu, kể cả hóa đơn đã thanh toán.
-     */
-    private void byDatPhong(
-            HttpServletRequest r,
-            HttpServletResponse p)
+
+    private void byDatPhong(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
 
-        r.setAttribute(
-                "items",
-                service.findByDatPhong(req(r, "maDatPhong"))
-        );
-
-        r.getRequestDispatcher(
-                "/hoa-don/danh-sach.jsp"
-        ).forward(r, p);
+        r.setAttribute("items", service.findByDatPhong(req(r, "maDatPhong")));
+        r.getRequestDispatcher("/hoa-don/danh-sach.jsp").forward(r, p);
     }
 
-    private void detail(
-            HttpServletRequest r,
-            HttpServletResponse p)
+    private void detail(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
 
         HoaDon x = service.findById(req(r, "id"));
-
-        if (x == null) {
-            throw new IllegalArgumentException(
-                    "Không tìm thấy hóa đơn."
-            );
-        }
+        if (x == null) {throw new IllegalArgumentException("Không tìm thấy hóa đơn.");}
 
         r.setAttribute("item", x);
-
-        r.getRequestDispatcher(
-                "/hoa-don/chi-tiet.jsp"
-        ).forward(r, p);
+        r.getRequestDispatcher("/hoa-don/chi-tiet.jsp").forward(r, p);
     }
 
-    private static String req(
-            HttpServletRequest r, String n) {
+    private static String req(HttpServletRequest r, String n) {
 
         String x = r.getParameter(n);
-
-        if (x == null || x.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Thiếu tham số: " + n
-            );
-        }
-
+        if (x == null || x.isBlank()) {throw new IllegalArgumentException("Thiếu tham số: " + n);}
         return x.trim();
     }
 

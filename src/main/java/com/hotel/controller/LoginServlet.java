@@ -26,6 +26,8 @@ public class LoginServlet extends HttpServlet {
         try {
             if (maNV == null || maNV.isBlank() || matKhau == null || matKhau.isBlank()) throw new IllegalArgumentException("Vui lòng nhập mã nhân viên và mật khẩu.");
             TaiKhoan tk = service.dangNhap(maNV.trim(), matKhau);
+            HttpSession oldSession = req.getSession(false);
+            if (oldSession != null) {oldSession.invalidate();}
             HttpSession session = req.getSession(true);
             session.setAttribute("maNV", tk.getNhanVien().getMaNV());
             session.setAttribute("hoTen", tk.getNhanVien().getHoTen());

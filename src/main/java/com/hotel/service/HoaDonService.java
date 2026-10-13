@@ -437,4 +437,15 @@ public class HoaDonService {
 
         Hibernate.initialize(hd.getChiTietHoaDon());
     }
+    public List<HoaDon> findChuaThanhToan() {
+        TransactionManager tm = new TransactionManager();
+
+        try {
+            return new HoaDonDAO().findChuaThanhToan(
+                tm.getEntityManager()
+            );
+        } finally {
+            tm.close();
+        }
+    }
 }

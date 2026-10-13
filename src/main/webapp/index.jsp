@@ -25,7 +25,13 @@
     <div><div class="nav-label">Kế toán & hệ thống</div><nav class="nav-list">
       <a class="nav-link" href="${pageContext.request.contextPath}/hoa-don"><span class="nav-icon">▧</span>Hóa đơn</a>
       <a class="nav-link" href="${pageContext.request.contextPath}/thanh-toan"><span class="nav-icon">＄</span>Thanh toán</a>
-      <c:if test="${sessionScope.vaiTro == 'ADMIN'}"><a class="nav-link" href="${pageContext.request.contextPath}/nhan-vien"><span class="nav-icon">♧</span>Nhân viên & tài khoản</a></c:if>
+      <c:if test="${sessionScope.vaiTro == 'ADMIN'}">
+          <a class="nav-link" href="${pageContext.request.contextPath}/nhan-vien"><span class="nav-icon">♧</span>Nhân viên & tài khoản</a>
+      </c:if>
+      <c:if test="${sessionScope.vaiTro == 'ADMIN' or sessionScope.vaiTro == 'QUAN_LY'}">
+          <a class="nav-link" href="${pageContext.request.contextPath}/thong-ke"><span class="nav-icon">📈</span>Thống kê</a>
+          <a class="nav-link" href="${pageContext.request.contextPath}/bao-cao"><span class="nav-icon">📋</span>Báo cáo</a>
+      </c:if>
     </nav></div>
     <div class="sidebar-foot">QLKhachSan · Java MVC<br>Hệ thống quản lý vận hành khách sạn</div>
   </aside>
@@ -49,7 +55,13 @@
         <a class="module-card" href="${pageContext.request.contextPath}/su-dung-dich-vu"><span class="module-icon">＋</span><span><h3>Sử dụng dịch vụ</h3><p>Ghi nhận dịch vụ khách sử dụng trong thời gian lưu trú.</p></span><span class="module-arrow">›</span></a>
         <a class="module-card" href="${pageContext.request.contextPath}/hoa-don"><span class="module-icon">▧</span><span><h3>Hóa đơn</h3><p>Xem hóa đơn và các khoản thu từ phòng, dịch vụ.</p></span><span class="module-arrow">›</span></a>
         <a class="module-card" href="${pageContext.request.contextPath}/thanh-toan"><span class="module-icon">＄</span><span><h3>Thanh toán</h3><p>Theo dõi phương thức, trạng thái và mã giao dịch.</p></span><span class="module-arrow">›</span></a>
-        <c:if test="${sessionScope.vaiTro == 'ADMIN'}"><a class="module-card" href="${pageContext.request.contextPath}/nhan-vien"><span class="module-icon">♧</span><span><h3>Nhân viên & tài khoản</h3><p>Quản lý nhân sự và phân quyền truy cập hệ thống.</p></span><span class="module-arrow">›</span></a></c:if>
+        <c:if test="${sessionScope.vaiTro == 'ADMIN'}">
+            <a class="module-card" href="${pageContext.request.contextPath}/nhan-vien"><span class="module-icon">♧</span><span><h3>Nhân viên & tài khoản</h3><p>Quản lý nhân sự và phân quyền truy cập hệ thống.</p></span><span class="module-arrow">›</span></a>
+        </c:if>
+        <c:if test="${sessionScope.vaiTro == 'ADMIN' or sessionScope.vaiTro == 'QUAN_LY'}">
+            <a class="module-card" href="${pageContext.request.contextPath}/thong-ke"><span class="module-icon">📈</span><span><h3>Thống kê</h3><p>Theo dõi chỉ số doanh thu, công suất phòng và biểu đồ tăng trưởng.</p></span><span class="module-arrow">›</span></a>
+            <a class="module-card" href="${pageContext.request.contextPath}/bao-cao"><span class="module-icon">📋</span><span><h3>Báo cáo</h3><p>Xuất các báo cáo tổng hợp chi tiết về doanh thu và hoạt động.</p></span><span class="module-arrow">›</span></a>
+        </c:if>
       </div>
       <div class="notice">ℹ️ Dữ liệu thống kê sẽ được hiển thị khi các truy vấn tổng hợp được kết nối. Các thẻ hiện tại là lối tắt nghiệp vụ, không phải số liệu giả lập.</div>
     </div>

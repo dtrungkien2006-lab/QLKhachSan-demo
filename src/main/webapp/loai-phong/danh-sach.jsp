@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -8,8 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Loại phòng | QLKhachSan</title>
 
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/app.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
 
     <style>
         .wrap {
@@ -106,19 +105,17 @@
     <div class="bar">
         <div>
             <div class="eyebrow">QLKhachSan / Quản lý</div>
-
             <h1 style="font-size:25px; margin:5px 0">
                 Quản lý loại phòng
             </h1>
-
             <p class="muted">
                 Quản lý dữ liệu kết nối với cơ sở dữ liệu khách sạn.
             </p>
         </div>
 
         <div class="actions">
-            <a class="btn btn-primary"
-               href="${pageContext.request.contextPath}/loai-phong?action=new">
+            <a class="btn" href="${pageContext.request.contextPath}/">← Dashboard</a>
+            <a class="btn btn-primary" href="${pageContext.request.contextPath}/loai-phong?action=new">
                 ＋ Thêm mới
             </a>
         </div>
@@ -159,7 +156,7 @@
                     </td>
 
                     <td>
-                        <c:out value="${x.giaCoBan}"/> ₫
+                        <fmt:formatNumber value="${x.giaCoBan}" type="number" pattern="#,##0" /> đ
                     </td>
 
                     <td>
@@ -193,8 +190,7 @@
 
 </main>
 
-<script src="${pageContext.request.contextPath}/js/shared-layout.js"
-        defer></script>
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script>
 
 </body>
 </html>

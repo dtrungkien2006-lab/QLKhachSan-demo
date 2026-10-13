@@ -1,36 +1,36 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Báo cáo</title>
+    <title>Báo cáo | Horizon Hotel</title>
     <style>
         :root { --xanh:#2563eb; --nen:#f8fafc; --vien:#e2e8f0; --chu:#0f172a; --mo:#64748b; }
-        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 30px auto; padding: 0 16px; color: var(--chu); }
-        table { width:100%; border-collapse:collapse; margin:10px 0 24px; }
-        th,td { border:1px solid var(--vien); padding:8px; }
-        th { background:var(--nen); text-align:left; }
-        .error { padding:10px; background:#ffe5e5; margin:10px 0; border-radius:6px; }
-        .filter { background:var(--nen); padding:12px; border:1px solid var(--vien); border-radius:8px; margin:15px 0; }
-        .filter label { margin-right:14px; display:inline-block; margin-bottom:6px; }
-        .tongket { width:auto; min-width:420px; }
+        table { width:100%; border-collapse:collapse; margin:10px 0 24px; background: #fff; }
+        th,td { border:1px solid var(--vien); padding:10px 12px; }
+        th { background:var(--nen); text-align:left; font-weight:600; }
+        .error { padding:12px; background:#ffe5e5; color:#c53030; margin:10px 0; border-radius:6px; }
+        .filter { background:#fff; padding:16px; border:1px solid var(--vien); border-radius:8px; margin:15px 0; display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+        .filter label { display:inline-flex; align-items:center; gap:6px; font-size:14px; }
+        .tongket { width:auto; min-width:380px; }
         .tongket td:first-child { font-weight:bold; background:var(--nen); }
-        .chart-box { max-width:760px; border:1px solid var(--vien); border-radius:8px; padding:12px; margin:12px 0 20px; }
-        .chart-box h4 { margin:0 0 8px; font-size:14px; color:var(--mo); }
+        .chart-box { max-width:100%; border:1px solid var(--vien); border-radius:8px; padding:16px; margin:12px 0 20px; background:#fff; }
+        .chart-box h4 { margin:0 0 12px; font-size:14px; color:var(--mo); }
         .ghichu { color:var(--mo); font-size:13px; }
-        a { margin-right:8px; }
-        @media print { .filter, .nav { display:none; } }
+        @media print { .filter, .sidebar, .topbar { display:none !important; } }
     </style>
 </head>
 <body>
-<a href="${pageContext.request.contextPath}/logout" class="nav">Đăng xuất</a>
-<h1>Báo cáo</h1>
-<div class="nav">
-    <a href="${pageContext.request.contextPath}/">Trang chủ</a>
-    <a href="${pageContext.request.contextPath}/thong-ke">Thống kê</a>
-    <a href="${pageContext.request.contextPath}/hoa-don?action=list">Hóa đơn</a>
+
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">Hệ thống báo cáo</div>
+        <h1>Xuất báo cáo chi tiết 📋</h1>
+        <p class="subtitle">Tổng hợp dữ liệu kinh doanh, tình hình sử dụng phòng và lượt lưu trú.</p>
+    </div>
 </div>
 
 <form class="filter" method="get" action="${pageContext.request.contextPath}/bao-cao">
@@ -51,11 +51,11 @@
             </c:forEach>
         </select>
     </label>
-    <label><input type="checkbox" name="nhap" value="1" ${nhap ? 'checked' : ''}> Tính cả hóa đơn nháp (dự kiến)</label>
-    <button type="submit">Xem báo cáo</button>
+    <label><input type="checkbox" name="nhap" value="1" ${nhap ? 'checked' : ''}> Tính cả hóa đơn nháp</label>
+    <button type="submit" class="btn btn-primary">Xem báo cáo</button>
     <c:if test="${not empty baoCao}">
-        <a href="${pageContext.request.contextPath}/bao-cao?loai=${loai}&tuNgay=${tuNgay}&denNgay=${denNgay}&kieu=${kieu}${nhap ? '&nhap=1' : ''}&format=csv">Xuất CSV</a>
-        <a href="#" onclick="window.print(); return false;">In</a>
+        <a href="${pageContext.request.contextPath}/bao-cao?loai=${loai}&tuNgay=${tuNgay}&denNgay=${denNgay}&kieu=${kieu}${nhap ? '&nhap=1' : ''}&format=csv" class="btn">Xuất CSV</a>
+        <button type="button" class="btn" onclick="window.print();">In báo cáo</button>
     </c:if>
 </form>
 
@@ -80,7 +80,20 @@
         </thead>
         <tbody>
         <c:forEach var="row" items="${baoCao.dong}">
-            <tr><c:forEach var="cell" items="${row}"><td><c:out value="${cell}"/></td></c:forEach></tr>
+            <tr>
+                <c:forEach var="cell" items="${row}">
+                    <td>
+                        <c:choose>
+                            <c:when test="${cell ne null and (cell.getClass().name.contains('Double') or cell.getClass().name.contains('Long') or cell.getClass().name.contains('Integer') or cell.getClass().name.contains('BigDecimal'))}">
+                                <fmt:formatNumber value="${cell}" type="number" pattern="#,##0" />
+                            </c:when>
+                            <c:otherwise>
+                                <c:out value="${cell}"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
+                </c:forEach>
+            </tr>
         </c:forEach>
         <c:if test="${empty baoCao.dong}">
             <tr><td colspan="${baoCao.cot.size()}">Không có dữ liệu trong kỳ báo cáo.</td></tr>
@@ -91,7 +104,19 @@
     <h3>Tổng kết</h3>
     <table class="tongket">
         <c:forEach var="e" items="${baoCao.tongKet}">
-            <tr><td>${e.key}</td><td><c:out value="${e.value}"/></td></tr>
+            <tr>
+                <td>${e.key}</td>
+                <td>
+                    <c:choose>
+                        <c:when test="${e.value ne null and (e.value.getClass().name.contains('Double') or e.value.getClass().name.contains('Long') or e.value.getClass().name.contains('Integer') or e.value.getClass().name.contains('BigDecimal'))}">
+                            <fmt:formatNumber value="${e.value}" type="number" pattern="#,##0" /> đ
+                        </c:when>
+                        <c:otherwise>
+                            <c:out value="${e.value}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+            </tr>
         </c:forEach>
     </table>
 
@@ -100,10 +125,7 @@
         <script>
         (function () {
             var hop = document.querySelector('.chart-box');
-            if (typeof Chart === 'undefined') {
-                hop.insertAdjacentHTML('beforeend', '<p class="ghichu">Không tải được thư viện biểu đồ (cần kết nối Internet).</p>');
-                return;
-            }
+            if (typeof Chart === 'undefined') return;
             var MAU = ['#2563eb', '#0d9488', '#d97706', '#e11d48', '#7c3aed', '#64748b'];
             var fmt = function (n) { return Number(n).toLocaleString('vi-VN'); };
             var nhan = ${baoCao.nhanJson};
@@ -131,5 +153,8 @@
         </script>
     </c:if>
 </c:if>
+
+<!-- Thêm script chung để tự động bao bọc giao diện Layout -->
+<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script>
 </body>
 </html>

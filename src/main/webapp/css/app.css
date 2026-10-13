@@ -64,6 +64,8 @@ textarea {
 .main-wrapper {
     min-width: 0;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* =========================
@@ -78,7 +80,7 @@ textarea {
     flex-direction: column;
     gap: 25px;
     flex-shrink: 0;
-    background: linear-gradient(180deg, #12243a, #0c1929) !important;
+    background: linear-gradient(180deg, var(--navy), #0c1929) !important;
     color: #dbe5f1;
 }
 
@@ -96,7 +98,7 @@ textarea {
     flex-shrink: 0;
     border-radius: 13px;
     background: #fff;
-    color: #12243a;
+    color: var(--navy);
     display: grid;
     place-items: center;
     font-size: 21px;
@@ -196,7 +198,33 @@ textarea {
     color: var(--text);
 }
 
-/* Topbar actions: system name + logout */
+/* User chip / avatar styles */
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #e5edff;
+    color: #244fc4;
+    font-weight: 800;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.user-role {
+    font-size: 11px;
+    color: var(--muted);
+}
 
 .topbar-actions {
     display: flex;
