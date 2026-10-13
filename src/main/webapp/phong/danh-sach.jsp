@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Phòng | QLKhachSan</title>
 
     <link rel="stylesheet"
@@ -37,7 +38,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 650px;
+            min-width: 750px;
         }
 
         th, td {
@@ -58,43 +59,50 @@
             font-size: 13px;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0 18px;
-            max-width: 780px;
-            background: white;
-            padding: 24px;
-            border: 1px solid #e5eaf1;
-            border-radius: 14px;
-        }
-
-        .form-grid input,
-        .form-grid select,
-        .form-grid textarea {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #d8e0ea;
-            border-radius: 8px;
-        }
-
         .actions {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .actions a,
+        .actions button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .delete-button {
+            border: 0;
+            background: none;
+            color: #dc2626;
+            padding: 0;
+        }
+
+        .delete-button:hover {
+            text-decoration: underline;
         }
 
         .muted {
             color: #718096;
         }
 
+        .success {
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+        }
+
+        .error {
+            margin-bottom: 16px;
+        }
+
         @media (max-width: 650px) {
             .wrap {
                 padding: 15px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -106,11 +114,13 @@
     <div class="bar">
         <div>
             <div class="eyebrow">QLKhachSan / Quản lý</div>
-            <h1 style="font-size:25px; margin:5px 0">
+
+            <h1 style="font-size:25px; margin:5px 0;">
                 Quản lý phòng
             </h1>
+
             <p class="muted">
-                Quản lý dữ liệu kết nối với cơ sở dữ liệu khách sạn.
+                Quản lý dữ liệu phòng khách sạn.
             </p>
         </div>
 
@@ -121,6 +131,18 @@
             </a>
         </div>
     </div>
+
+    <c:if test="${param.success eq 'saved'}">
+        <div class="success">Lưu thông tin phòng thành công.</div>
+    </c:if>
+
+    <c:if test="${param.success eq 'deleted'}">
+        <div class="success">Xóa phòng thành công.</div>
+    </c:if>
+
+    <c:if test="${param.success eq 'status'}">
+        <div class="success">Cập nhật trạng thái phòng thành công.</div>
+    </c:if>
 
     <c:if test="${not empty error}">
         <div class="error">
@@ -168,13 +190,31 @@
 
                     <td>
                         <div class="actions">
-                            <a href="${pageContext.request.contextPath}/phong?action=edit&id=${x.maPhong}">
+                            <a href="${pageContext.request.contextPath}/phong?action=edit&amp;id=${x.maPhong}">
                                 Sửa
                             </a>
 
-                            <a href="${pageContext.request.contextPath}/phong?action=detail&id=${x.maPhong}">
+                            <a href="${pageContext.request.contextPath}/phong?action=detail&amp;id=${x.maPhong}">
                                 Chi tiết
                             </a>
+
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/phong"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa phòng này không?');"
+                                  style="display:inline; margin:0;">
+
+                                <input type="hidden"
+                                       name="action"
+                                       value="xoa">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="<c:out value='${x.maPhong}'/>">
+
+                                <button type="submit" class="delete-button">
+                                    Xóa
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>
