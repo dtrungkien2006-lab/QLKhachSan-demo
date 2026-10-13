@@ -25,4 +25,29 @@ public class HoaDonDAO
                 .setParameter("maDatPhong", maDatPhong)
                 .getResultList();
     }
+    public List<HoaDon> findChuaThanhToan(EntityManager em) {
+        String jpql = """
+            SELECT h
+            FROM HoaDon h
+            WHERE h.trangThai = :trangThai
+              AND h.tongTien > (
+                  SELECT COALESCE(SUM(t.soTien), 0)
+                  FROM ThanhToan t
+                  WHERE t.datPhong = h.datPhong
+                    AND t.trangThai = :daThanhToan
+              )
+            ORDER BY h.ngayLap DESC
+            """;
+
+        return em.createQuery(jpql, HoaDon.class)
+                .setParameter(
+                    "trangThai",
+                    com.hotel.enums.TrangThaiHoaDon.DA_PHAT_HANH
+                )
+                .setParameter(
+                    "daThanhToan",
+                    com.hotel.enums.TrangThaiThanhToan.DA_THANH_TOAN
+                )
+                .getResultList();
+    }
 }
