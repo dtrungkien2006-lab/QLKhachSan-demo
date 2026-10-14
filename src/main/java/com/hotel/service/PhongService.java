@@ -1,4 +1,3 @@
-
 package com.hotel.service;
 
 import com.hotel.config.TransactionManager;
@@ -19,17 +18,13 @@ public class PhongService {
     private final PhongDAO dao = new PhongDAO();
     private final LoaiPhongDAO loaiPhongDAO = new LoaiPhongDAO();
 
-    /**
-     * THÊM PHÒNG MỚI
-     */
     public void them(Phong x) {
-        validate(x);
-
         TransactionManager tm = new TransactionManager();
         try {
             tm.begin();
             EntityManager em = tm.getEntityManager();
 
+            // Tự động sinh mã phòng nếu để trống hoặc null
             if (x.getMaPhong() == null || x.getMaPhong().isBlank()) {
                 x.setMaPhong(
                         MaCodeGenerator.nextId(
@@ -38,18 +33,28 @@ public class PhongService {
                                 "P"
                         )
                 );
+            } else {
+                // Nếu người dùng tự nhập mã, kiểm tra xem đã tồn tại chưa
+                if (dao.findById(em, x.getMaPhong().trim()) != null) {
+                    throw new IllegalArgumentException(
+                            "Mã phòng đã tồn tại: " + x.getMaPhong()
+                    );
+                }
+                x.setMaPhong(x.getMaPhong().trim());
             }
 
-            if (dao.findById(em, x.getMaPhong()) != null) {
-                throw new IllegalArgumentException(
-                        "Mã phòng đã tồn tại: " + x.getMaPhong()
-                );
+            if (x.getSoPhong() == null || x.getSoPhong().isBlank()) {
+                throw new IllegalArgumentException("Số phòng không được để trống.");
             }
 
-            if (dao.findBySoPhong(em, x.getSoPhong()) != null) {
+            if (dao.findBySoPhong(em, x.getSoPhong().trim()) != null) {
                 throw new IllegalArgumentException(
                         "Số phòng đã tồn tại: " + x.getSoPhong()
                 );
+            }
+
+            if (x.getLoaiPhong() == null || x.getLoaiPhong().getMaLoaiPhong() == null) {
+                throw new IllegalArgumentException("Vui lòng chọn loại phòng.");
             }
 
             LoaiPhong lp = loaiPhongDAO.findById(
@@ -64,6 +69,10 @@ public class PhongService {
             }
 
             x.setLoaiPhong(lp);
+            x.setSoPhong(x.getSoPhong().trim());
+            if (x.getViTri() != null) {
+                x.setViTri(x.getViTri().trim());
+            }
 
             if (x.getTrangThai() == null) {
                 x.setTrangThai(TrangThaiPhong.TRONG);
@@ -80,9 +89,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Tìm phòng theo mã phòng.
-     */
     public Phong findById(String id) {
         TransactionManager tm = new TransactionManager();
         try {
@@ -92,9 +98,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Tìm phòng theo mã và tải kèm loại phòng.
-     */
     public Phong findByIdWithLoaiPhong(String id) {
         TransactionManager tm = new TransactionManager();
         try {
@@ -107,9 +110,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Tìm phòng theo số phòng.
-     */
     public Phong findBySoPhong(String soPhong) {
         TransactionManager tm = new TransactionManager();
         try {
@@ -122,10 +122,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Lấy toàn bộ danh sách phòng cùng loại phòng.
-     * Sửa lỗi LazyInitializationException khi JSP đọc tenLoaiPhong.
-     */
     public List<Phong> findAll() {
         TransactionManager tm = new TransactionManager();
         try {
@@ -136,9 +132,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Lấy danh sách phòng theo loại phòng.
-     */
     public List<Phong> findByLoaiPhong(String maLoaiPhong) {
         TransactionManager tm = new TransactionManager();
         try {
@@ -151,9 +144,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Tìm phòng có thể đặt theo khoảng ngày.
-     */
     public List<Phong> findPhongCoTheDat(
             LocalDate ngayNhan,
             LocalDate ngayTra) {
@@ -172,9 +162,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Tìm phòng có thể đặt kết hợp bộ lọc.
-     */
     public List<Phong> findPhongCoTheDat(
             LocalDate ngayNhan,
             LocalDate ngayTra,
@@ -220,12 +207,7 @@ public class PhongService {
         }
     }
 
-    /**
-     * Cập nhật thông tin phòng.
-     */
     public void capNhat(Phong x) {
-        validate(x);
-
         TransactionManager tm = new TransactionManager();
         try {
             tm.begin();
@@ -272,9 +254,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Cập nhật trạng thái phòng.
-     */
     public void capNhatTrangThai(
             String maPhong,
             TrangThaiPhong trangThai) {
@@ -309,9 +288,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Xóa phòng.
-     */
     public void xoa(String id) {
         TransactionManager tm = new TransactionManager();
         try {
@@ -337,9 +313,6 @@ public class PhongService {
         }
     }
 
-    /**
-     * Kiểm tra khoảng ngày.
-     */
     private void validateKhoangNgay(
             LocalDate ngayNhan,
             LocalDate ngayTra) {
@@ -350,27 +323,5 @@ public class PhongService {
                     "Khoảng ngày không hợp lệ."
             );
         }
-    }
-
-    /**
-     * Kiểm tra dữ liệu phòng.
-     */
-    private void validate(Phong x) {
-        if (x == null
-                || blank(x.getMaPhong()) && x.getMaPhong() != null
-                || blank(x.getSoPhong())
-                || x.getLoaiPhong() == null
-                || blank(x.getLoaiPhong().getMaLoaiPhong())) {
-            throw new IllegalArgumentException(
-                    "Thông tin phòng không hợp lệ."
-            );
-        }
-    }
-
-    /**
-     * Kiểm tra chuỗi rỗng hoặc chỉ chứa khoảng trắng.
-     */
-    private boolean blank(String s) {
-        return s == null || s.isBlank();
     }
 }
