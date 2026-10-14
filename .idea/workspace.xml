@@ -9,9 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4f1cc166-5b20-4301-8323-0750af45736a" name="Changes" comment="refactor(tv2): bỏ bộ lọc giá ở trang tạo đặt phòng&#10;&#10;- Xóa ô giá từ / giá đến vì mỗi loại phòng chỉ có một mức giá,&#10;  lọc theo loại phòng đã đủ; giá vẫn hiển thị ở cột Giá cơ bản&#10;- Servlet không còn đọc tham số giaTu, giaDen">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="4f1cc166-5b20-4301-8323-0750af45736a" name="Changes" comment="refactor(tv2): bỏ bộ lọc giá ở trang tạo đặt phòng&#10;&#10;- Xóa ô giá từ / giá đến vì mỗi loại phòng chỉ có một mức giá,&#10;  lọc theo loại phòng đã đủ; giá vẫn hiển thị ở cột Giá cơ bản&#10;- Servlet không còn đọc tham số giaTu, giaDen" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
