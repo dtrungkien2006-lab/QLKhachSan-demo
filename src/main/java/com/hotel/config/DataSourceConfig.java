@@ -9,9 +9,14 @@ public class DataSourceConfig {
     static {
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl(getConfig("DB_URL","jdbc:mysql://localhost:3306/QLKhachSan"+ "?allowPublicKeyRetrieval=true"+ "&useSSL=false"+ "&serverTimezone=Asia/Ho_Chi_Minh"+ "&characterEncoding=UTF-8"));
-        config.setUsername(getConfig("DB_USERNAME", "root"));
-        config.setPassword(getConfig("DB_PASSWORD", "123456"));
+        // Lấy trực tiếp từ biến môi trường Railway, nếu không có mới dùng localhost để test local
+        String dbUrl = getConfig("DB_URL", "jdbc:mysql://localhost:3306/railway?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&characterEncoding=UTF-8");
+        String dbUser = getConfig("DB_USERNAME", "root");
+        String dbPassword = getConfig("DB_PASSWORD", "");
+
+        config.setJdbcUrl(dbUrl);
+        config.setUsername(dbUser);
+        config.setPassword(dbPassword);
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
         // Connection pool
@@ -30,12 +35,14 @@ public class DataSourceConfig {
 
     private DataSourceConfig() {}
     public static HikariDataSource getDataSource() {return DATA_SOURCE;}
+
     private static String getConfig(String key, String defaultValue) {
-        String systemProperty = System.getProperty(key);
-        if (systemProperty != null && !systemProperty.isBlank()) {return systemProperty;}
         String environmentVariable = System.getenv(key);
         if (environmentVariable != null && !environmentVariable.isBlank()) {return environmentVariable;}
+        String systemProperty = System.getProperty(key);
+        if (systemProperty != null && !systemProperty.isBlank()) {return systemProperty;}
         return defaultValue;
     }
+
     public static void close() {if (DATA_SOURCE != null && !DATA_SOURCE.isClosed()) {DATA_SOURCE.close();}}
 }
