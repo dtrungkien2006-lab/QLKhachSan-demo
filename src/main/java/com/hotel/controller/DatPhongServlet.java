@@ -37,6 +37,10 @@ public class DatPhongServlet extends HttpServlet {
     private CheckoutService checkoutService;
     private LoaiPhongService loaiPhongService;
 
+    // =====================================================================
+    // 1. KHỞI TẠO VÀ ĐIỂM VÀO (doGet đọc action, doPost nhận form đặt phòng)
+    // =====================================================================
+
     @Override
     public void init() {
         datPhongService = new DatPhongService();
@@ -100,40 +104,9 @@ public class DatPhongServlet extends HttpServlet {
         }
     }
 
-    private void list(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String maDatPhong = trimToNull(request.getParameter("maDatPhong"));
-        String khachHang = trimToNull(request.getParameter("khachHang"));
-        String trangThaiParam = trimToNull(request.getParameter("trangThai"));
-        String tuNgayParam = trimToNull(request.getParameter("tuNgay"));
-        String denNgayParam = trimToNull(request.getParameter("denNgay"));
-
-        List<DatPhong> datPhongs;
-        if (maDatPhong == null && khachHang == null && trangThaiParam == null
-                && tuNgayParam == null && denNgayParam == null) {
-            datPhongs = datPhongService.findAllWithKhachHang();
-        } else {
-            try {
-                TrangThaiDatPhong trangThai = trangThaiParam == null
-                        ? null : TrangThaiDatPhong.valueOf(trangThaiParam);
-                LocalDate tuNgay = tuNgayParam == null ? null : LocalDate.parse(tuNgayParam);
-                LocalDate denNgay = denNgayParam == null ? null : LocalDate.parse(denNgayParam);
-                datPhongs = datPhongService.traCuu(maDatPhong, khachHang, trangThai, tuNgay, denNgay);
-            } catch (DateTimeParseException e) {
-                request.setAttribute("error", "Ngày tra cứu không hợp lệ.");
-                datPhongs = List.of();
-            } catch (IllegalArgumentException e) {
-                request.setAttribute("error", "Trạng thái tra cứu không hợp lệ.");
-                datPhongs = List.of();
-            }
-        }
-
-        List<DatPhongListDTO> items = datPhongs.stream().map(this::toListDTO).toList();
-        request.setAttribute("items", items);
-        request.setAttribute("trangThais", TrangThaiDatPhong.values());
-        request.setAttribute("success", request.getParameter("success"));
-        request.getRequestDispatcher("/dat-phong/danh-sach.jsp").forward(request, response);
-    }
+    // =====================================================================
+    // 2. CÁC HÀNH ĐỘNG (theo thứ tự demo: tìm phòng/đặt, danh sách, chi tiết, xác nhận, hủy, check-in/out)
+    // =====================================================================
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -174,6 +147,41 @@ public class DatPhongServlet extends HttpServlet {
         request.getRequestDispatcher("/dat-phong/dat-phong.jsp").forward(request, response);
     }
 
+    private void list(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String maDatPhong = trimToNull(request.getParameter("maDatPhong"));
+        String khachHang = trimToNull(request.getParameter("khachHang"));
+        String trangThaiParam = trimToNull(request.getParameter("trangThai"));
+        String tuNgayParam = trimToNull(request.getParameter("tuNgay"));
+        String denNgayParam = trimToNull(request.getParameter("denNgay"));
+
+        List<DatPhong> datPhongs;
+        if (maDatPhong == null && khachHang == null && trangThaiParam == null
+                && tuNgayParam == null && denNgayParam == null) {
+            datPhongs = datPhongService.findAllWithKhachHang();
+        } else {
+            try {
+                TrangThaiDatPhong trangThai = trangThaiParam == null
+                        ? null : TrangThaiDatPhong.valueOf(trangThaiParam);
+                LocalDate tuNgay = tuNgayParam == null ? null : LocalDate.parse(tuNgayParam);
+                LocalDate denNgay = denNgayParam == null ? null : LocalDate.parse(denNgayParam);
+                datPhongs = datPhongService.traCuu(maDatPhong, khachHang, trangThai, tuNgay, denNgay);
+            } catch (DateTimeParseException e) {
+                request.setAttribute("error", "Ngày tra cứu không hợp lệ.");
+                datPhongs = List.of();
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("error", "Trạng thái tra cứu không hợp lệ.");
+                datPhongs = List.of();
+            }
+        }
+
+        List<DatPhongListDTO> items = datPhongs.stream().map(this::toListDTO).toList();
+        request.setAttribute("items", items);
+        request.setAttribute("trangThais", TrangThaiDatPhong.values());
+        request.setAttribute("success", request.getParameter("success"));
+        request.getRequestDispatcher("/dat-phong/danh-sach.jsp").forward(request, response);
+    }
+
     private void detail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String ma = required(request, "ma");
@@ -195,7 +203,6 @@ public class DatPhongServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/dat-phong?action=list&success=cancelled");
     }
 
-
     private void checkIn(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String maDatPhong = required(request, "ma");
         datPhongService.checkIn(maDatPhong, currentMaNV(request));
@@ -203,12 +210,15 @@ public class DatPhongServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/dat-phong?action=list&success=checkin");
     }
 
-
     private void checkOut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String maDatPhong = required(request, "ma");
         checkoutService.checkout(maDatPhong, currentMaNV(request));
         response.sendRedirect(request.getContextPath() + "/dat-phong?action=list&success=checkout");
     }
+
+    // =====================================================================
+    // 3. HÀM HỖ TRỢ (đọc form, đổi sang DTO, lấy nhân viên đăng nhập, tiện ích chuỗi)
+    // =====================================================================
 
     private DatPhongRequestDTO parseRequest(HttpServletRequest request) {
         String maKH = required(request, "maKH");
@@ -281,11 +291,12 @@ public class DatPhongServlet extends HttpServlet {
     private String value(String value, String fallback) {
         return notBlank(value) ? value : fallback;
     }
+
     private boolean notBlank(String value) {
         return value != null && !value.isBlank();
     }
+
     private String trimToNull(String value) {
         return notBlank(value) ? value.trim() : null;
     }
-
 }
