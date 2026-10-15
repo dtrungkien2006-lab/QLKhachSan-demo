@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import com.hotel.util.MaCodeGenerator;
 
 public class DatPhongService {
@@ -93,6 +94,21 @@ public class DatPhongService {
         try {
             transactionManager.begin(); // Bắt đầu Transaction
             EntityManager em = transactionManager.getEntityManager();
+
+            // KHÓA PHÒNG chống đặt trùng khi hai nhân viên đặt cùng lúc:
+            // - Khóa các phòng được chọn (PESSIMISTIC_WRITE = SELECT ... FOR UPDATE).
+            // - Khóa theo thứ tự mã phòng (TreeSet) để hai đơn giao nhau không khóa chéo gây deadlock.
+            // - Phải khóa TRƯỚC mọi lần đọc khác trong transaction, để sau khi chờ được khóa,
+            //   các lần kiểm tra trùng lịch bên dưới nhìn thấy đơn mà người kia vừa commit.
+            Set<String> maPhongCanKhoa = new TreeSet<>();
+            for (CtDatPhong chiTiet : danhSachChiTiet) {
+                if (chiTiet.getPhong() != null && chiTiet.getPhong().getMaPhong() != null) {
+                    maPhongCanKhoa.add(chiTiet.getPhong().getMaPhong());
+                }
+            }
+            for (String maPhong : maPhongCanKhoa) {
+                em.find(Phong.class, maPhong, LockModeType.PESSIMISTIC_WRITE);
+            }
 
             // [master] Ghi nhận nhân viên đang đăng nhập là người xử lý đặt phòng
             NhanVien nhanVienXuLy = nhanVienDAO.findById(em, maNVXuLy);
@@ -233,6 +249,9 @@ public class DatPhongService {
             }
             if (!ngayTra.isAfter(ngayNhan)) {
                 throw new IllegalArgumentException("Ngày trả phải sau ngày nhận.");
+            }
+            if (ngayNhan.isBefore(PhongService.homNay())) {
+                throw new IllegalArgumentException("Ngày nhận không được trước ngày hôm nay.");
             }
             if (chiTiet.getGiaPhong() == null) {
                 throw new IllegalArgumentException("Giá phòng không được null.");

@@ -77,8 +77,20 @@ public class DatPhongServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
+        String maKHVuaTao = null; // chỉ có giá trị khi vừa tạo khách mới thành công
         try {
             DatPhongRequestDTO dto = parseRequest(request);
+
+            // Khách hàng: chọn khách có sẵn HOẶC nhập nhanh khách mới (họ tên + số điện thoại)
+            String hoTenMoi = trimToNull(request.getParameter("hoTenMoi"));
+            String soDienThoaiMoi = trimToNull(request.getParameter("soDienThoaiMoi"));
+            boolean coKhachMoi = hoTenMoi != null || soDienThoaiMoi != null;
+            if (dto.getMaKH() == null && !coKhachMoi) {
+                throw new IllegalArgumentException("Phải chọn khách hàng hoặc nhập thông tin khách mới.");
+            }
+            if (dto.getMaKH() != null && coKhachMoi) {
+                throw new IllegalArgumentException("Chỉ chọn khách có sẵn hoặc nhập khách mới, không dùng cả hai.");
+            }
 
             KhachHang khachHang = new KhachHang();
             khachHang.setMaKH(dto.getMaKH());
@@ -92,6 +104,15 @@ public class DatPhongServlet extends HttpServlet {
                 rooms.add(room);
             }
 
+            // Tạo khách mới sau khi các kiểm tra đọc xong, ngay trước khi đặt phòng.
+            // KhachHangService.them tự sinh mã KH, kiểm tra họ tên, số điện thoại và trùng số điện thoại.
+            if (coKhachMoi) {
+                khachHang.setHoTen(hoTenMoi);
+                khachHang.setSoDienThoai(soDienThoaiMoi);
+                khachHangService.them(khachHang);
+                maKHVuaTao = khachHang.getMaKH();
+            }
+
             DatPhong datPhong = DatPhongMapper.toEntity(dto, khachHang, rooms);
 
             datPhongService.datPhong(datPhong, datPhong.getChiTietDatPhong(), currentMaNV(request), dto.getSoLuongKhach());
@@ -99,7 +120,14 @@ public class DatPhongServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath()
                     + "/dat-phong?action=list&success=created&ma=" + datPhong.getMaDatPhong());
         } catch (IllegalArgumentException | IllegalStateException e) {
-            request.setAttribute("error", e.getMessage());
+            if (maKHVuaTao != null) {
+                // Khách đã được lưu nhưng đặt phòng thất bại: chọn sẵn khách đó để nhân viên thử lại
+                request.setAttribute("maKHDaChon", maKHVuaTao);
+                request.setAttribute("error", "Đã tạo khách hàng " + maKHVuaTao
+                        + " nhưng đặt phòng chưa thành công: " + e.getMessage());
+            } else {
+                request.setAttribute("error", e.getMessage());
+            }
             showCreateForm(request, response);
         }
     }
@@ -112,6 +140,7 @@ public class DatPhongServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("khachHangs", khachHangService.findAll());
         request.setAttribute("loaiPhongs", loaiPhongService.findAll());
+        request.setAttribute("homNay", PhongService.homNay()); // ô ngày nhận không cho chọn ngày đã qua
 
         String ngayNhanParam = request.getParameter("ngayNhan");
         String ngayTraParam = request.getParameter("ngayTra");
@@ -221,7 +250,7 @@ public class DatPhongServlet extends HttpServlet {
     // =====================================================================
 
     private DatPhongRequestDTO parseRequest(HttpServletRequest request) {
-        String maKH = required(request, "maKH");
+        String maKH = trimToNull(request.getParameter("maKH")); // có thể null nếu nhập khách mới
         String[] maPhongs = request.getParameterValues("maPhong");
         String ngayNhanParam = required(request, "ngayNhan");
         String ngayTraParam = required(request, "ngayTra");

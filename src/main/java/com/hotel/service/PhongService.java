@@ -11,6 +11,7 @@ import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 public class PhongService {
@@ -92,6 +93,14 @@ public class PhongService {
     }
 
     /**
+     * Ngày hôm nay theo giờ Việt Nam (server như Railway chạy múi giờ UTC nên
+     * không dùng LocalDate.now() mặc định).
+     */
+    public static LocalDate homNay() {
+        return LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+    }
+
+    /**
      * Kiểm tra khoảng ngày.
      */
     private void validateKhoangNgay(
@@ -102,6 +111,12 @@ public class PhongService {
                 || !ngayTra.isAfter(ngayNhan)) {
             throw new IllegalArgumentException(
                     "Khoảng ngày không hợp lệ."
+            );
+        }
+
+        if (ngayNhan.isBefore(homNay())) {
+            throw new IllegalArgumentException(
+                    "Ngày nhận không được trước ngày hôm nay."
             );
         }
     }

@@ -579,7 +579,8 @@
                                type="date"
                                id="ngayNhan"
                                name="ngayNhan"
-                               value="${ngayNhan}"
+                               min="<c:out value="${homNay}"/>"
+                               value="<c:out value="${ngayNhan}"/>"
                                required>
                         <small class="booking-help">
                             Ngày khách dự kiến bắt đầu lưu trú.
@@ -594,7 +595,7 @@
                                type="date"
                                id="ngayTra"
                                name="ngayTra"
-                               value="${ngayTra}"
+                               value="<c:out value="${ngayTra}"/>"
                                required>
                         <small class="booking-help">
                             Ngày khách dự kiến kết thúc lưu trú.
@@ -688,10 +689,10 @@
                       action="${pageContext.request.contextPath}/dat-phong"
                       id="createBookingForm">
 
-                    <input type="hidden" name="ngayNhan" value="${ngayNhan}">
-                    <input type="hidden" name="ngayTra" value="${ngayTra}">
+                    <input type="hidden" name="ngayNhan" value="<c:out value="${ngayNhan}"/>">
+                    <input type="hidden" name="ngayTra" value="<c:out value="${ngayTra}"/>">
                     <input type="hidden" name="maLoaiPhong"
-                           value="${param.maLoaiPhong}">
+                           value="<c:out value="${param.maLoaiPhong}"/>">
 
                     <div class="booking-form-grid">
                         <div class="booking-field">
@@ -699,10 +700,11 @@
                                 Khách hàng <span class="required">*</span>
                             </label>
                             <select class="booking-control"
-                                    id="maKH" name="maKH" required>
+                                    id="maKH" name="maKH">
                                 <option value="">Chọn khách hàng</option>
                                 <c:forEach var="kh" items="${khachHangs}">
-                                    <option value="${kh.maKH}">
+                                    <option value="${kh.maKH}"
+                                        ${kh.maKH == maKHDaChon ? 'selected' : ''}>
                                         <c:out value="${kh.maKH}"/> -
                                         <c:out value="${kh.hoTen}"/> -
                                         <c:out value="${kh.soDienThoai}"/>
@@ -710,7 +712,7 @@
                                 </c:forEach>
                             </select>
                             <small class="booking-help">
-                                Chọn khách hàng đứng tên đặt phòng.
+                                Chọn khách hàng đứng tên đặt phòng, hoặc nhập khách mới ở dưới.
                             </small>
                         </div>
 
@@ -723,11 +725,36 @@
                                    id="soLuongKhach"
                                    name="soLuongKhach"
                                    min="1"
-                                   value="${param.soLuongKhach}"
+                                   value="<c:out value="${param.soLuongKhach}"/>"
                                    placeholder="Nhập số lượng khách"
                                    required>
                             <small class="booking-help">
                                 Hệ thống sử dụng thông tin này để kiểm tra sức chứa.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="booking-form-grid">
+                        <div class="booking-field">
+                            <label for="hoTenMoi">Họ tên khách mới</label>
+                            <input class="booking-control"
+                                   type="text"
+                                   id="hoTenMoi"
+                                   name="hoTenMoi"
+                                   maxlength="100"
+                                   placeholder="Chỉ nhập khi khách chưa có trong danh sách">
+                        </div>
+
+                        <div class="booking-field">
+                            <label for="soDienThoaiMoi">Số điện thoại khách mới</label>
+                            <input class="booking-control"
+                                   type="text"
+                                   id="soDienThoaiMoi"
+                                   name="soDienThoaiMoi"
+                                   maxlength="15"
+                                   placeholder="Số điện thoại không được trùng khách khác">
+                            <small class="booking-help">
+                                Nhập họ tên và số điện thoại để tạo nhanh khách hàng, không cần chọn ở ô trên.
                             </small>
                         </div>
                     </div>
@@ -879,6 +906,27 @@
                 dateTo.setCustomValidity('');
             }
         });
+    }
+
+    // Khách hàng: chọn khách có sẵn HOẶC nhập khách mới (họ tên + số điện thoại)
+    const customerSelect = document.getElementById('maKH');
+    const newName = document.getElementById('hoTenMoi');
+    const newPhone = document.getElementById('soDienThoaiMoi');
+
+    function syncCustomerFields() {
+        if (!customerSelect || !newName || !newPhone) {
+            return;
+        }
+        const hasNew = newName.value.trim() !== '' || newPhone.value.trim() !== '';
+        customerSelect.required = !hasNew;
+        newName.required = hasNew;
+        newPhone.required = hasNew;
+    }
+
+    if (customerSelect && newName && newPhone) {
+        newName.addEventListener('input', syncCustomerFields);
+        newPhone.addEventListener('input', syncCustomerFields);
+        syncCustomerFields();
     }
 
     const selectAll = document.getElementById('selectAllRooms');

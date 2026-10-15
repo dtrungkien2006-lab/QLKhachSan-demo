@@ -14,12 +14,12 @@
     </style>
 </head>
 <body>
-<h1>Chi tiết đặt phòng ${item.maDatPhong}</h1>
+<h1>Chi tiết đặt phòng <c:out value="${item.maDatPhong}"/></h1>
 <a href="${pageContext.request.contextPath}/dat-phong?action=list">← Danh sách đặt phòng</a>
 
 <table>
-    <tr><th>Mã đặt phòng</th><td>${item.maDatPhong}</td></tr>
-    <tr><th>Khách hàng</th><td>${item.khachHang.maKH} - ${item.khachHang.hoTen} - ${item.khachHang.soDienThoai}</td></tr>
+    <tr><th>Mã đặt phòng</th><td><c:out value="${item.maDatPhong}"/></td></tr>
+    <tr><th>Khách hàng</th><td><c:out value="${item.khachHang.maKH}"/> - <c:out value="${item.khachHang.hoTen}"/> - <c:out value="${item.khachHang.soDienThoai}"/></td></tr>
     <tr><th>Ngày đặt</th><td>${item.ngayDat}</td></tr>
     <tr><th>Trạng thái</th>
         <td>
@@ -35,7 +35,7 @@
             </c:choose>
         </td>
     </tr>
-    <tr><th>Ghi chú</th><td>${item.ghiChu}</td></tr>
+    <tr><th>Ghi chú</th><td><c:out value="${item.ghiChu}"/></td></tr>
 </table>
 
 <h3>Các phòng trong đặt phòng</h3>
@@ -49,9 +49,9 @@
     <tbody>
     <c:forEach var="ct" items="${item.chiTietDatPhong}">
         <tr>
-            <td>${ct.maCTDatPhong}</td>
-            <td>${ct.phong.soPhong}</td>
-            <td>${ct.phong.loaiPhong.tenLoaiPhong}</td>
+            <td><c:out value="${ct.maCTDatPhong}"/></td>
+            <td><c:out value="${ct.phong.soPhong}"/></td>
+            <td><c:out value="${ct.phong.loaiPhong.tenLoaiPhong}"/></td>
             <td>${ct.ngayNhan}</td>
             <td>${ct.ngayTra}</td>
             <td>${ct.giaPhong}</td>
