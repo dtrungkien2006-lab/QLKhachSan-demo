@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -5,225 +6,242 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Thông tin dịch vụ | QLKhachSan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin khách hàng</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
 
     <style>
-        .wrap {
-            max-width: 1250px;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .form-box {
+            max-width: 650px;
             margin: 0 auto;
             padding: 28px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
 
-        .bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+        h1 {
+            margin: 0 0 24px;
+            font-size: 26px;
+            color: #1e3a8a;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-            max-width: 780px;
-            padding: 24px;
-            background: #fff;
-            border: 1px solid #e5eaf1;
-            border-radius: 14px;
+        label {
+            display: block;
+            margin: 15px 0 6px;
+            font-weight: bold;
         }
 
-        .form-grid input,
-        .form-grid select,
-        .form-grid textarea {
-            box-sizing: border-box;
+        input,
+        select {
+            display: block;
             width: 100%;
-            padding: 11px;
-            border: 1px solid #d8e0ea;
-            border-radius: 8px;
-            font: inherit;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 15px;
         }
 
-        .form-grid textarea {
-            resize: vertical;
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
         }
 
-        .field {
+        input[readonly] {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .buttons {
             display: flex;
-            flex-direction: column;
-            gap: 7px;
+            gap: 10px;
+            margin-top: 24px;
         }
 
-        .field > span {
+        button,
+        .back {
+            display: inline-block;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 6px;
             font-size: 14px;
-            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
         }
 
-        .full-width {
-            grid-column: 1 / -1;
+        button {
+            background: #2563eb;
+            color: white;
         }
 
-        .actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
+        .back {
+            background: #e5e7eb;
+            color: #111827;
         }
 
-        .muted {
-            color: #718096;
+        button:hover,
+        .back:hover {
+            opacity: 0.85;
         }
 
-        @media (max-width: 650px) {
-            .wrap {
-                padding: 15px;
-            }
+        .error {
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 6px;
+        }
 
-            .form-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 480px) {
+            .form-box {
                 padding: 18px;
             }
 
-            .full-width {
-                grid-column: auto;
+            h1 {
+                font-size: 22px;
             }
         }
     </style>
 </head>
 
 <body>
-<main class="wrap">
+<div class="form-box">
 
-    <!-- Tiêu đề và điều hướng -->
-    <div class="bar">
-        <div>
-            <div class="eyebrow">QLKhachSan / Quản lý</div>
+    <h1>
+        <c:choose>
+            <c:when test="${not empty item}">
+                Sửa thông tin khách hàng
+            </c:when>
+            <c:otherwise>
+                Thêm khách hàng
+            </c:otherwise>
+        </c:choose>
+    </h1>
 
-            <h1 style="font-size: 25px; margin: 5px 0;">
-                Thông tin dịch vụ
-            </h1>
-
-            <p class="muted">
-                Quản lý dữ liệu kết nối với cơ sở dữ liệu khách sạn.
-            </p>
-        </div>
-
-        <div class="actions">
-            <a class="btn"
-               href="${pageContext.request.contextPath}/">
-                ← Dashboard
-            </a>
-
-            <a class="btn btn-primary"
-               href="${pageContext.request.contextPath}/dich-vu?action=new">
-                ＋ Thêm mới
-            </a>
-        </div>
-    </div>
-
-    <!-- Thông báo lỗi -->
     <c:if test="${not empty error}">
         <div class="error">
             <c:out value="${error}"/>
         </div>
     </c:if>
 
-    <!-- Form thêm mới hoặc cập nhật dịch vụ -->
-    <form class="form-grid"
-          method="post"
-          action="${pageContext.request.contextPath}/dich-vu">
+    <form method="post"
+          accept-charset="UTF-8"
+          action="${pageContext.request.contextPath}/khach-hang">
 
-        <!-- Mã dịch vụ -->
-        <label class="field">
-            <span>Mã dịch vụ (để trống khi thêm)</span>
+        <!-- Phân biệt rõ thêm mới và cập nhật -->
+        <c:choose>
+            <c:when test="${not empty item}">
+                <input type="hidden" name="action" value="update">
 
-            <input type="text"
-                   name="maDichVu"
-                   value="${item.maDichVu}">
-        </label>
+                <label for="maKH">Mã khách hàng</label>
+                <input type="text"
+                       id="maKH"
+                       name="maKH"
+                       value="<c:out value='${item.maKH}'/>"
+                       readonly>
+            </c:when>
 
-        <!-- Tên dịch vụ -->
-        <label class="field">
-            <span>Tên dịch vụ</span>
+            <c:otherwise>
+                <input type="hidden" name="action" value="create">
 
-            <input type="text"
-                   name="tenDichVu"
-                   value="${item.tenDichVu}"
-                   required>
-        </label>
+                <label for="maKH">Mã khách hàng</label>
+                <input type="text"
+                       id="maKH"
+                       value="Tự động tạo khi lưu thành công"
+                       readonly>
+            </c:otherwise>
+        </c:choose>
 
-        <!-- Đơn giá -->
-        <label class="field">
-            <span>Đơn giá (VNĐ)</span>
+        <label for="hoTen">Họ và tên *</label>
+        <input type="text"
+               id="hoTen"
+               name="hoTen"
+               value="<c:out value='${item.hoTen}'/>"
+               maxlength="100"
+               required>
 
-            <input type="number"
-                   name="donGia"
-                   min="0"
-                   step="1000"
-                   value="${item.donGia}"
-                   required>
-        </label>
+        <label for="cccd">Số CCCD *</label>
+        <input type="text"
+               id="cccd"
+               name="cccd"
+               value="<c:out value='${item.cccd}'/>"
+               maxlength="12"
+               pattern="[0-9]{12}"
+               title="CCCD phải gồm đúng 12 chữ số"
+               required>
 
-        <!-- Loại dịch vụ -->
-        <label class="field">
-            <span>Loại dịch vụ</span>
+        <label for="ngaySinh">Ngày sinh</label>
+        <input type="date"
+               id="ngaySinh"
+               name="ngaySinh"
+               value="${item.ngaySinh}">
 
-            <input type="text"
-                   name="loaiDichVu"
-                   value="${item.loaiDichVu}"
-                   placeholder="DoUong, DoAn...">
-        </label>
+        <label for="gioiTinh">Giới tính</label>
+        <select id="gioiTinh" name="gioiTinh">
+            <option value="">-- Chọn giới tính --</option>
 
-        <!-- Mô tả -->
-        <label class="field full-width">
-            <span>Mô tả</span>
+            <option value="NAM"
+                ${gioiTinhDaChon eq 'NAM' ? 'selected' : ''}>
+                Nam
+            </option>
 
-            <textarea name="moTa"
-                      rows="3"><c:out value="${item.moTa}"/></textarea>
-        </label>
+            <option value="NU"
+                ${gioiTinhDaChon eq 'NU' ? 'selected' : ''}>
+                Nữ
+            </option>
+        </select>
 
-        <!-- Trạng thái kinh doanh -->
-        <label class="field">
-            <span>Trạng thái kinh doanh</span>
+        <label for="soDienThoai">Số điện thoại *</label>
+        <input type="tel"
+               id="soDienThoai"
+               name="soDienThoai"
+               value="<c:out value='${item.soDienThoai}'/>"
+               maxlength="15"
+               required>
 
-            <select name="dangKinhDoanh">
-                <option value="true"
-                    ${item.dangKinhDoanh == null || item.dangKinhDoanh
-                        ? 'selected' : ''}>
-                    Đang kinh doanh
-                </option>
+        <label for="email">Email</label>
+        <input type="email"
+               id="email"
+               name="email"
+               value="<c:out value='${item.email}'/>"
+               maxlength="100">
 
-                <option value="false"
-                    ${item.dangKinhDoanh != null && !item.dangKinhDoanh
-                        ? 'selected' : ''}>
-                    Ngừng kinh doanh
-                </option>
-            </select>
-        </label>
+        <label for="diaChi">Địa chỉ</label>
+        <input type="text"
+               id="diaChi"
+               name="diaChi"
+               value="<c:out value='${item.diaChi}'/>"
+               maxlength="255">
 
-        <!-- Nút thao tác -->
-        <div class="actions full-width">
-            <button type="submit" class="btn btn-primary">
-                Lưu dịch vụ
-            </button>
+        <div class="buttons">
+            <button type="submit">Lưu thông tin</button>
 
-            <a class="btn"
-               href="${pageContext.request.contextPath}/dich-vu">
-                Hủy
+            <a class="back"
+               href="${pageContext.request.contextPath}/khach-hang?action=list">
+                Quay lại
             </a>
         </div>
 
     </form>
-</main>
+</div>
 
 <script src="${pageContext.request.contextPath}/js/shared-layout.js"
         defer></script>
-
 </body>
 </html>
