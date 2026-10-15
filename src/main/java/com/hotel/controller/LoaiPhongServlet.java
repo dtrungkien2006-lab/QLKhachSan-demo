@@ -24,10 +24,7 @@ public class LoaiPhongServlet extends HttpServlet {
 
         String a = v(r.getParameter("action"), "list");
 
-        if ("new".equals(a)
-                || "edit".equals(a)
-                || "delete".equals(a)) {
-
+        if ("new".equals(a) || "edit".equals(a)) {
             if (PhanQuyen.tuChoiNeuKhongCoQuyen(r, p)) {return;}
         }
 
@@ -35,7 +32,6 @@ public class LoaiPhongServlet extends HttpServlet {
             switch (a) {
                 case "new" -> form(r, p, null);
                 case "edit" -> form(r, p, service.findById(req(r, "id")));
-                case "delete" -> del(r, p);
                 case "detail" -> detail(r, p);
                 default -> list(r, p);
             }
@@ -45,32 +41,49 @@ public class LoaiPhongServlet extends HttpServlet {
         }
     }
 
+
     @Override
     protected void doPost(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
 
         if (PhanQuyen.tuChoiNeuKhongCoQuyen(r, p)) {return;}
 
+        String a = v(r.getParameter("action"), "save");
+
         try {
+            if ("delete".equals(a)) {
+                service.xoa(req(r, "id"));
+
+                p.sendRedirect(r.getContextPath() + "/loai-phong?action=list&success=deleted");
+                return;
+            }
+
+            if (!"save".equals(a)) {
+                throw new IllegalArgumentException("Thao tác không hợp lệ.");
+            }
+
             LoaiPhong x = new LoaiPhong();
 
             x.setMaLoaiPhong(trim(r.getParameter("maLoaiPhong")));
             x.setTenLoaiPhong(req(r, "tenLoaiPhong"));
             x.setMoTa(r.getParameter("moTa"));
             x.setGiaCoBan(new BigDecimal(req(r, "giaCoBan")));
-            x.setSoNguoiToiDa(
-                    Integer.valueOf(req(r, "soNguoiToiDa"))
-            );
+            x.setSoNguoiToiDa(Integer.valueOf(req(r, "soNguoiToiDa")));
 
-            if (blank(x.getMaLoaiPhong())) {service.them(x);}
-            else {service.capNhat(x);}
+            if (blank(x.getMaLoaiPhong())) {
+                service.them(x);
+            } else {
+                service.capNhat(x);
+            }
 
             p.sendRedirect(r.getContextPath() + "/loai-phong?action=list&success=saved");
+
         } catch (IllegalArgumentException | IllegalStateException e) {
             r.setAttribute("error", e.getMessage());
             list(r, p);
         }
     }
+
 
     private void list(HttpServletRequest r, HttpServletResponse p)
             throws ServletException, IOException {
