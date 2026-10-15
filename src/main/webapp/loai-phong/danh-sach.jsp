@@ -126,6 +126,11 @@
             <c:out value="${error}"/>
         </div>
     </c:if>
+    <c:if test="${param.success eq 'deleted'}">
+        <div class="success">
+            Xóa loại phòng thành công.
+        </div>
+    </c:if>
 
     <div class="table-wrap">
         <table>
@@ -172,6 +177,22 @@
                             <a href="${pageContext.request.contextPath}/loai-phong?action=detail&id=${x.maLoaiPhong}">
                                 Chi tiết
                             </a>
+                            <form method="post"
+                                  action="${pageContext.request.contextPath}/loai-phong"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa loại phòng ${x.maLoaiPhong} - ${x.tenLoaiPhong}?');"
+                                  style="display:inline; margin:0;">
+
+                                <input type="hidden" name="action" value="delete">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="<c:out value='${x.maLoaiPhong}'/>">
+
+                                <button type="submit"
+                                        style="border:none; background:none; color:#dc2626; cursor:pointer; padding:0; font:inherit;">
+                                    Xóa
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>

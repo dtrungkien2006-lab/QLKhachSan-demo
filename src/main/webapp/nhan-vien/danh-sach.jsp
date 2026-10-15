@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý nhân viên | Horizon Hotel</title>
+    <title>Quản lý nhân viên | UTE Hotel</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
@@ -565,7 +565,7 @@
 <div class="staff-page">
 
     <nav class="staff-breadcrumb" aria-label="Điều hướng">
-        <a href="${pageContext.request.contextPath}/">Horizon Hotel</a>
+        <a href="${pageContext.request.contextPath}/">UTE Hotel</a>
         <span>/</span>
         <strong>Nhân viên</strong>
     </nav>

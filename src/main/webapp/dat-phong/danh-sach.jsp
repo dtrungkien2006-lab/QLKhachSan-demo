@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý đặt phòng | Horizon Hotel</title>
+    <title>Quản lý đặt phòng | UTE Hotel</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
@@ -941,7 +941,7 @@
                 <strong><c:out value="${items.size()}"/></strong>
                 bản ghi theo điều kiện hiện tại.
             </span>
-            <span>Horizon Hotel · Hotel Management System</span>
+            <span>UTE Hotel · Hotel Management System</span>
         </div>
 
     </section>
