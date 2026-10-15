@@ -23,9 +23,20 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import com.hotel.util.MaCodeGenerator;
 
 public class DatPhongService {
+
+    // =====================================================================
+    // MỤC LỤC (sắp xếp theo thứ tự trình bày demo)
+    //   1. ĐẶT PHÒNG ........ datPhong (2 bản), validateDatPhong, taoHoaDonNhap
+    //   2. TRA CỨU, CHI TIẾT . findById, findByKhachHang, findAllWithKhachHang,
+    //                          findByTrangThai, traCuu, findByIdWithChiTiet
+    //   3. HỦY ĐẶT PHÒNG .... huyDatPhong
+    //   4. HÀM TỪ MASTER ..... xacNhanDatPhong, checkIn, checkOut
+    //   5. OVERLOAD CŨ ....... các bản không có mã nhân viên (giữ cho test/code cũ)
+    // =====================================================================
 
     // Khởi tạo các DAO cần thiết để thao tác với bảng DatPhong, CtDatPhong và Phong
     private final DatPhongDAO datPhongDAO;
@@ -44,6 +55,10 @@ public class DatPhongService {
         this.hoaDonDAO = new HoaDonDAO();
         this.ctHoaDonDAO = new CtHoaDonDAO();
     }
+
+    // =====================================================================
+    // 1. ĐẶT PHÒNG
+    // =====================================================================
 
     /**
      * TẠO ĐẶT PHÒNG (Bản nạp chồng 3 tham số - giữ đúng chữ ký của nhóm trưởng trên master)
@@ -79,6 +94,21 @@ public class DatPhongService {
         try {
             transactionManager.begin(); // Bắt đầu Transaction
             EntityManager em = transactionManager.getEntityManager();
+
+            // KHÓA PHÒNG chống đặt trùng khi hai nhân viên đặt cùng lúc:
+            // - Khóa các phòng được chọn (PESSIMISTIC_WRITE = SELECT ... FOR UPDATE).
+            // - Khóa theo thứ tự mã phòng (TreeSet) để hai đơn giao nhau không khóa chéo gây deadlock.
+            // - Phải khóa TRƯỚC mọi lần đọc khác trong transaction, để sau khi chờ được khóa,
+            //   các lần kiểm tra trùng lịch bên dưới nhìn thấy đơn mà người kia vừa commit.
+            Set<String> maPhongCanKhoa = new TreeSet<>();
+            for (CtDatPhong chiTiet : danhSachChiTiet) {
+                if (chiTiet.getPhong() != null && chiTiet.getPhong().getMaPhong() != null) {
+                    maPhongCanKhoa.add(chiTiet.getPhong().getMaPhong());
+                }
+            }
+            for (String maPhong : maPhongCanKhoa) {
+                em.find(Phong.class, maPhong, LockModeType.PESSIMISTIC_WRITE);
+            }
 
             // [master] Ghi nhận nhân viên đang đăng nhập là người xử lý đặt phòng
             NhanVien nhanVienXuLy = nhanVienDAO.findById(em, maNVXuLy);
@@ -190,6 +220,83 @@ public class DatPhongService {
     }
 
     /**
+     * HÀM HỖ TRỢ VALIDATE DỮ LIỆU ĐẦU VÀO
+     */
+    private void validateDatPhong(DatPhong datPhong, List<CtDatPhong> danhSachChiTiet, String maNVXuLy) {
+        if (datPhong == null) {
+            throw new IllegalArgumentException("Thông tin đặt phòng không được null.");
+        }
+        // [master] Bắt buộc có nhân viên đăng nhập tiếp nhận đặt phòng
+        if (maNVXuLy == null || maNVXuLy.isBlank()) {
+            throw new IllegalArgumentException("Phải xác định nhân viên tiếp nhận đặt phòng.");
+        }
+        if (datPhong.getKhachHang() == null) {
+            throw new IllegalArgumentException("Đặt phòng phải có khách hàng.");
+        }
+        if (danhSachChiTiet == null || danhSachChiTiet.isEmpty()) {
+            throw new IllegalArgumentException("Đặt phòng phải có ít nhất một phòng.");
+        }
+
+        for (CtDatPhong chiTiet : danhSachChiTiet) {
+            if (chiTiet == null) {
+                throw new IllegalArgumentException("Chi tiết đặt phòng không hợp lệ.");
+            }
+            LocalDate ngayNhan = chiTiet.getNgayNhan();
+            LocalDate ngayTra = chiTiet.getNgayTra();
+
+            if (ngayNhan == null || ngayTra == null) {
+                throw new IllegalArgumentException("Ngày nhận và ngày trả không được null.");
+            }
+            if (!ngayTra.isAfter(ngayNhan)) {
+                throw new IllegalArgumentException("Ngày trả phải sau ngày nhận.");
+            }
+            if (ngayNhan.isBefore(PhongService.homNay())) {
+                throw new IllegalArgumentException("Ngày nhận không được trước ngày hôm nay.");
+            }
+            if (chiTiet.getGiaPhong() == null) {
+                throw new IllegalArgumentException("Giá phòng không được null.");
+            }
+        }
+
+        // Kiểm tra độ dài ghi chú để không bị lỗi tràn trường SQL (VARCHAR(500))
+        if (datPhong.getGhiChu() != null && datPhong.getGhiChu().length() > 500) {
+            throw new IllegalArgumentException("Ghi chú tối đa 500 ký tự.");
+        }
+    }
+
+    private void taoHoaDonNhap(EntityManager em, DatPhong datPhong, List<CtDatPhong> chiTiet) {
+        HoaDon hoaDon = new HoaDon();
+        hoaDon.setMaHoaDon(MaCodeGenerator.nextId(hoaDonDAO.findAll(em), "maHoaDon", "HD"));
+        hoaDon.setDatPhong(datPhong);
+        hoaDon.setNgayLap(java.time.LocalDateTime.now());
+        java.math.BigDecimal tongPhong = java.math.BigDecimal.ZERO;
+        Set<String> reservedCt = new HashSet<>();
+        List<CtHoaDon> existingCt = ctHoaDonDAO.findAll(em);
+        for (CtDatPhong ct : chiTiet) {
+            long soDem = java.time.temporal.ChronoUnit.DAYS.between(ct.getNgayNhan(), ct.getNgayTra());
+            java.math.BigDecimal tien = ct.getGiaPhong().multiply(java.math.BigDecimal.valueOf(soDem));
+            tongPhong = tongPhong.add(tien);
+            CtHoaDon line = new CtHoaDon();
+            line.setMaCtHoaDon(MaCodeGenerator.nextId(existingCt, "maCtHoaDon", "CTHD", reservedCt));
+            reservedCt.add(line.getMaCtHoaDon());
+            line.setHoaDon(hoaDon);
+            line.setTenKhoanThu("Tiền phòng " + (ct.getPhong() == null ? "" : ct.getPhong().getSoPhong()));
+            line.setSoLuong(1); line.setDonGia(ct.getGiaPhong()); line.setThanhTien(tien);
+            hoaDon.getChiTietHoaDon().add(line);
+        }
+        hoaDon.setTongTienPhong(tongPhong);
+        hoaDon.setTongTienDichVu(java.math.BigDecimal.ZERO);
+        hoaDon.setTongTien(tongPhong);
+        hoaDon.setTrangThai(TrangThaiHoaDon.NHAP);
+        hoaDonDAO.save(em, hoaDon);
+        for (CtHoaDon line : hoaDon.getChiTietHoaDon()) ctHoaDonDAO.save(em, line);
+    }
+
+    // =====================================================================
+    // 2. TRA CỨU, CHI TIẾT
+    // =====================================================================
+
+    /**
      * Tìm đơn đặt phòng theo mã
      */
     public DatPhong findById(String maDatPhong) {
@@ -236,6 +343,46 @@ public class DatPhongService {
             transactionManager.close();
         }
     }
+
+    /**
+     * NGHIỆP VỤ 2 CỦA TV2: TRA CỨU ĐẶT PHÒNG ĐA TIÊU CHÍ
+     */
+    public List<DatPhong> traCuu(
+            String maDatPhong,
+            String khachHang,
+            TrangThaiDatPhong trangThai,
+            LocalDate tuNgay,
+            LocalDate denNgay) {
+
+        TransactionManager transactionManager = new TransactionManager();
+        try {
+            return datPhongDAO.traCuu(
+                    transactionManager.getEntityManager(),
+                    maDatPhong, khachHang, trangThai, tuNgay, denNgay
+            );
+        } finally {
+            transactionManager.close();
+        }
+    }
+
+    /**
+     * NGHIỆP VỤ 2 CỦA TV2: LẤY CHI TIẾT ĐẶT PHÒNG KÈM DANH SÁCH PHÒNG ĐÃ CHỌN
+     */
+    public DatPhong findByIdWithChiTiet(String maDatPhong) {
+        TransactionManager transactionManager = new TransactionManager();
+        try {
+            return datPhongDAO.findByIdWithChiTiet(
+                    transactionManager.getEntityManager(),
+                    maDatPhong
+            );
+        } finally {
+            transactionManager.close();
+        }
+    }
+
+    // =====================================================================
+    // 3. HỦY ĐẶT PHÒNG
+    // =====================================================================
 
     /**
      * NGHIỆP VỤ 2 CỦA TV2: HỦY ĐẶT PHÒNG
@@ -286,84 +433,6 @@ public class DatPhongService {
         } catch (Exception e) {
             transactionManager.rollback();
             throw e;
-        } finally {
-            transactionManager.close();
-        }
-    }
-
-    /**
-     * HÀM HỖ TRỢ VALIDATE DỮ LIỆU ĐẦU VÀO
-     */
-    private void validateDatPhong(DatPhong datPhong, List<CtDatPhong> danhSachChiTiet, String maNVXuLy) {
-        if (datPhong == null) {
-            throw new IllegalArgumentException("Thông tin đặt phòng không được null.");
-        }
-        // [master] Bắt buộc có nhân viên đăng nhập tiếp nhận đặt phòng
-        if (maNVXuLy == null || maNVXuLy.isBlank()) {
-            throw new IllegalArgumentException("Phải xác định nhân viên tiếp nhận đặt phòng.");
-        }
-        if (datPhong.getKhachHang() == null) {
-            throw new IllegalArgumentException("Đặt phòng phải có khách hàng.");
-        }
-        if (danhSachChiTiet == null || danhSachChiTiet.isEmpty()) {
-            throw new IllegalArgumentException("Đặt phòng phải có ít nhất một phòng.");
-        }
-
-        for (CtDatPhong chiTiet : danhSachChiTiet) {
-            if (chiTiet == null) {
-                throw new IllegalArgumentException("Chi tiết đặt phòng không hợp lệ.");
-            }
-            LocalDate ngayNhan = chiTiet.getNgayNhan();
-            LocalDate ngayTra = chiTiet.getNgayTra();
-
-            if (ngayNhan == null || ngayTra == null) {
-                throw new IllegalArgumentException("Ngày nhận và ngày trả không được null.");
-            }
-            if (!ngayTra.isAfter(ngayNhan)) {
-                throw new IllegalArgumentException("Ngày trả phải sau ngày nhận.");
-            }
-            if (chiTiet.getGiaPhong() == null) {
-                throw new IllegalArgumentException("Giá phòng không được null.");
-            }
-        }
-
-        // Kiểm tra độ dài ghi chú để không bị lỗi tràn trường SQL (VARCHAR(500))
-        if (datPhong.getGhiChu() != null && datPhong.getGhiChu().length() > 500) {
-            throw new IllegalArgumentException("Ghi chú tối đa 500 ký tự.");
-        }
-    }
-
-    /**
-     * NGHIỆP VỤ 2 CỦA TV2: TRA CỨU ĐẶT PHÒNG ĐA TIÊU CHÍ
-     */
-    public List<DatPhong> traCuu(
-            String maDatPhong,
-            String khachHang,
-            TrangThaiDatPhong trangThai,
-            LocalDate tuNgay,
-            LocalDate denNgay) {
-
-        TransactionManager transactionManager = new TransactionManager();
-        try {
-            return datPhongDAO.traCuu(
-                    transactionManager.getEntityManager(),
-                    maDatPhong, khachHang, trangThai, tuNgay, denNgay
-            );
-        } finally {
-            transactionManager.close();
-        }
-    }
-
-    /**
-     * NGHIỆP VỤ 2 CỦA TV2: LẤY CHI TIẾT ĐẶT PHÒNG KÈM DANH SÁCH PHÒNG ĐÃ CHỌN
-     */
-    public DatPhong findByIdWithChiTiet(String maDatPhong) {
-        TransactionManager transactionManager = new TransactionManager();
-        try {
-            return datPhongDAO.findByIdWithChiTiet(
-                    transactionManager.getEntityManager(),
-                    maDatPhong
-            );
         } finally {
             transactionManager.close();
         }
@@ -534,6 +603,7 @@ public class DatPhongService {
             transactionManager.close();
         }
     }
+
     /*
      * CHECK-OUT (TV3 + TV5)
      * Ghi nhận nhân viên check-out và cập nhật trạng thái đặt phòng, phòng.
@@ -639,6 +709,10 @@ public class DatPhongService {
         }
     }
 
+    // =====================================================================
+    // 5. OVERLOAD CŨ (giữ nguyên để test/code cũ vẫn biên dịch được)
+    // =====================================================================
+
     /** Tương thích các test/code cũ; code web phải truyền mã nhân viên. */
     public void datPhong(DatPhong datPhong, List<CtDatPhong> danhSachChiTiet) {
         throw new IllegalArgumentException("Đặt phòng phải được thực hiện bởi nhân viên đăng nhập.");
@@ -654,34 +728,6 @@ public class DatPhongService {
 
     public void checkOut(String maDatPhong) {
         throw new IllegalArgumentException("Check-out phải có nhân viên đăng nhập.");
-    }
-
-    private void taoHoaDonNhap(EntityManager em, DatPhong datPhong, List<CtDatPhong> chiTiet) {
-        HoaDon hoaDon = new HoaDon();
-        hoaDon.setMaHoaDon(MaCodeGenerator.nextId(hoaDonDAO.findAll(em), "maHoaDon", "HD"));
-        hoaDon.setDatPhong(datPhong);
-        hoaDon.setNgayLap(java.time.LocalDateTime.now());
-        java.math.BigDecimal tongPhong = java.math.BigDecimal.ZERO;
-        Set<String> reservedCt = new HashSet<>();
-        List<CtHoaDon> existingCt = ctHoaDonDAO.findAll(em);
-        for (CtDatPhong ct : chiTiet) {
-            long soDem = java.time.temporal.ChronoUnit.DAYS.between(ct.getNgayNhan(), ct.getNgayTra());
-            java.math.BigDecimal tien = ct.getGiaPhong().multiply(java.math.BigDecimal.valueOf(soDem));
-            tongPhong = tongPhong.add(tien);
-            CtHoaDon line = new CtHoaDon();
-            line.setMaCtHoaDon(MaCodeGenerator.nextId(existingCt, "maCtHoaDon", "CTHD", reservedCt));
-            reservedCt.add(line.getMaCtHoaDon());
-            line.setHoaDon(hoaDon);
-            line.setTenKhoanThu("Tiền phòng " + (ct.getPhong() == null ? "" : ct.getPhong().getSoPhong()));
-            line.setSoLuong(1); line.setDonGia(ct.getGiaPhong()); line.setThanhTien(tien);
-            hoaDon.getChiTietHoaDon().add(line);
-        }
-        hoaDon.setTongTienPhong(tongPhong);
-        hoaDon.setTongTienDichVu(java.math.BigDecimal.ZERO);
-        hoaDon.setTongTien(tongPhong);
-        hoaDon.setTrangThai(TrangThaiHoaDon.NHAP);
-        hoaDonDAO.save(em, hoaDon);
-        for (CtHoaDon line : hoaDon.getChiTietHoaDon()) ctHoaDonDAO.save(em, line);
     }
 
 }

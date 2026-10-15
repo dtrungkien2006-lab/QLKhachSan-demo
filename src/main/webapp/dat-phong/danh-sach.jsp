@@ -674,7 +674,7 @@
                     <input id="maDatPhong"
                            type="text"
                            name="maDatPhong"
-                           value="${param.maDatPhong}"
+                           value="<c:out value="${param.maDatPhong}"/>"
                            placeholder="VD: DP001">
                 </div>
 
@@ -683,7 +683,7 @@
                     <input id="khachHang"
                            type="text"
                            name="khachHang"
-                           value="${param.khachHang}"
+                           value="<c:out value="${param.khachHang}"/>"
                            placeholder="Tên khách hoặc số điện thoại">
                 </div>
 
@@ -725,7 +725,7 @@
                     <input id="tuNgay"
                            type="date"
                            name="tuNgay"
-                           value="${param.tuNgay}">
+                           value="<c:out value="${param.tuNgay}"/>">
                 </div>
 
                 <div class="booking-field">
@@ -733,7 +733,7 @@
                     <input id="denNgay"
                            type="date"
                            name="denNgay"
-                           value="${param.denNgay}">
+                           value="<c:out value="${param.denNgay}"/>">
                 </div>
 
             </div>
@@ -856,7 +856,7 @@
                             </c:choose>
                         </td>
 
-                        <td class="booking-note" title="${item.ghiChu}">
+                        <td class="booking-note" title="<c:out value="${item.ghiChu}"/>">
                             <c:choose>
                                 <c:when test="${not empty item.ghiChu}">
                                     <c:out value="${item.ghiChu}"/>

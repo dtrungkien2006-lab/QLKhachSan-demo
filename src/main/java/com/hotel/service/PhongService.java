@@ -1,4 +1,3 @@
-
 package com.hotel.service;
 
 import com.hotel.config.TransactionManager;
@@ -12,6 +11,7 @@ import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 public class PhongService {
@@ -19,66 +19,111 @@ public class PhongService {
     private final PhongDAO dao = new PhongDAO();
     private final LoaiPhongDAO loaiPhongDAO = new LoaiPhongDAO();
 
+    // =====================================================================
+    // 1. TÌM PHÒNG TRỐNG THEO KHOẢNG NGÀY (TV2)
+    // =====================================================================
+
     /**
-     * THÊM PHÒNG MỚI
+     * Tìm phòng có thể đặt theo khoảng ngày.
      */
-    public void them(Phong x) {
-        validate(x);
+    public List<Phong> findPhongCoTheDat(
+            LocalDate ngayNhan,
+            LocalDate ngayTra) {
+
+        validateKhoangNgay(ngayNhan, ngayTra);
 
         TransactionManager tm = new TransactionManager();
         try {
-            tm.begin();
-            EntityManager em = tm.getEntityManager();
-
-            if (x.getMaPhong() == null || x.getMaPhong().isBlank()) {
-                x.setMaPhong(
-                        MaCodeGenerator.nextId(
-                                dao.findAll(em),
-                                "maPhong",
-                                "P"
-                        )
-                );
-            }
-
-            if (dao.findById(em, x.getMaPhong()) != null) {
-                throw new IllegalArgumentException(
-                        "Mã phòng đã tồn tại: " + x.getMaPhong()
-                );
-            }
-
-            if (dao.findBySoPhong(em, x.getSoPhong()) != null) {
-                throw new IllegalArgumentException(
-                        "Số phòng đã tồn tại: " + x.getSoPhong()
-                );
-            }
-
-            LoaiPhong lp = loaiPhongDAO.findById(
-                    em,
-                    x.getLoaiPhong().getMaLoaiPhong()
+            return dao.findPhongCoTheDat(
+                    tm.getEntityManager(),
+                    ngayNhan,
+                    ngayTra
             );
-
-            if (lp == null) {
-                throw new IllegalArgumentException(
-                        "Không tìm thấy loại phòng."
-                );
-            }
-
-            x.setLoaiPhong(lp);
-
-            if (x.getTrangThai() == null) {
-                x.setTrangThai(TrangThaiPhong.TRONG);
-            }
-
-            dao.save(em, x);
-            tm.commit();
-
-        } catch (Exception e) {
-            tm.rollback();
-            throw e;
         } finally {
             tm.close();
         }
     }
+
+    /**
+     * Tìm phòng có thể đặt kết hợp bộ lọc.
+     */
+    public List<Phong> findPhongCoTheDat(
+            LocalDate ngayNhan,
+            LocalDate ngayTra,
+            String maLoaiPhong,
+            BigDecimal giaTu,
+            BigDecimal giaDen,
+            TrangThaiPhong trangThai) {
+
+        validateKhoangNgay(ngayNhan, ngayTra);
+
+        if (giaTu != null && giaTu.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(
+                    "Giá từ không được âm."
+            );
+        }
+
+        if (giaDen != null && giaDen.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(
+                    "Giá đến không được âm."
+            );
+        }
+
+        if (giaTu != null && giaDen != null
+                && giaTu.compareTo(giaDen) > 0) {
+            throw new IllegalArgumentException(
+                    "Giá từ không được lớn hơn giá đến."
+            );
+        }
+
+        TransactionManager tm = new TransactionManager();
+        try {
+            return dao.findPhongCoTheDat(
+                    tm.getEntityManager(),
+                    ngayNhan,
+                    ngayTra,
+                    maLoaiPhong,
+                    giaTu,
+                    giaDen,
+                    trangThai
+            );
+        } finally {
+            tm.close();
+        }
+    }
+
+    /**
+     * Ngày hôm nay theo giờ Việt Nam (server như Railway chạy múi giờ UTC nên
+     * không dùng LocalDate.now() mặc định).
+     */
+    public static LocalDate homNay() {
+        return LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+    }
+
+    /**
+     * Kiểm tra khoảng ngày.
+     */
+    private void validateKhoangNgay(
+            LocalDate ngayNhan,
+            LocalDate ngayTra) {
+
+        if (ngayNhan == null || ngayTra == null
+                || !ngayTra.isAfter(ngayNhan)) {
+            throw new IllegalArgumentException(
+                    "Khoảng ngày không hợp lệ."
+            );
+        }
+
+        if (ngayNhan.isBefore(homNay())) {
+            throw new IllegalArgumentException(
+                    "Ngày nhận không được trước ngày hôm nay."
+            );
+        }
+    }
+
+    // =====================================================================
+    // 2. TRA CỨU PHÒNG
+    // =====================================================================
 
     /**
      * Tìm phòng theo mã phòng.
@@ -151,70 +196,66 @@ public class PhongService {
         }
     }
 
-    /**
-     * Tìm phòng có thể đặt theo khoảng ngày.
-     */
-    public List<Phong> findPhongCoTheDat(
-            LocalDate ngayNhan,
-            LocalDate ngayTra) {
+    // =====================================================================
+    // 3. QUẢN LÝ PHÒNG (thêm, sửa, đổi trạng thái, xóa)
+    // =====================================================================
 
-        validateKhoangNgay(ngayNhan, ngayTra);
+    /**
+     * THÊM PHÒNG MỚI
+     */
+    public void them(Phong x) {
+        validate(x);
 
         TransactionManager tm = new TransactionManager();
         try {
-            return dao.findPhongCoTheDat(
-                    tm.getEntityManager(),
-                    ngayNhan,
-                    ngayTra
+            tm.begin();
+            EntityManager em = tm.getEntityManager();
+
+            if (x.getMaPhong() == null || x.getMaPhong().isBlank()) {
+                x.setMaPhong(
+                        MaCodeGenerator.nextId(
+                                dao.findAll(em),
+                                "maPhong",
+                                "P"
+                        )
+                );
+            }
+
+            if (dao.findById(em, x.getMaPhong()) != null) {
+                throw new IllegalArgumentException(
+                        "Mã phòng đã tồn tại: " + x.getMaPhong()
+                );
+            }
+
+            if (dao.findBySoPhong(em, x.getSoPhong()) != null) {
+                throw new IllegalArgumentException(
+                        "Số phòng đã tồn tại: " + x.getSoPhong()
+                );
+            }
+
+            LoaiPhong lp = loaiPhongDAO.findById(
+                    em,
+                    x.getLoaiPhong().getMaLoaiPhong()
             );
-        } finally {
-            tm.close();
-        }
-    }
 
-    /**
-     * Tìm phòng có thể đặt kết hợp bộ lọc.
-     */
-    public List<Phong> findPhongCoTheDat(
-            LocalDate ngayNhan,
-            LocalDate ngayTra,
-            String maLoaiPhong,
-            BigDecimal giaTu,
-            BigDecimal giaDen,
-            TrangThaiPhong trangThai) {
+            if (lp == null) {
+                throw new IllegalArgumentException(
+                        "Không tìm thấy loại phòng."
+                );
+            }
 
-        validateKhoangNgay(ngayNhan, ngayTra);
+            x.setLoaiPhong(lp);
 
-        if (giaTu != null && giaTu.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException(
-                    "Giá từ không được âm."
-            );
-        }
+            if (x.getTrangThai() == null) {
+                x.setTrangThai(TrangThaiPhong.TRONG);
+            }
 
-        if (giaDen != null && giaDen.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException(
-                    "Giá đến không được âm."
-            );
-        }
+            dao.save(em, x);
+            tm.commit();
 
-        if (giaTu != null && giaDen != null
-                && giaTu.compareTo(giaDen) > 0) {
-            throw new IllegalArgumentException(
-                    "Giá từ không được lớn hơn giá đến."
-            );
-        }
-
-        TransactionManager tm = new TransactionManager();
-        try {
-            return dao.findPhongCoTheDat(
-                    tm.getEntityManager(),
-                    ngayNhan,
-                    ngayTra,
-                    maLoaiPhong,
-                    giaTu,
-                    giaDen,
-                    trangThai
-            );
+        } catch (Exception e) {
+            tm.rollback();
+            throw e;
         } finally {
             tm.close();
         }
@@ -337,20 +378,9 @@ public class PhongService {
         }
     }
 
-    /**
-     * Kiểm tra khoảng ngày.
-     */
-    private void validateKhoangNgay(
-            LocalDate ngayNhan,
-            LocalDate ngayTra) {
-
-        if (ngayNhan == null || ngayTra == null
-                || !ngayTra.isAfter(ngayNhan)) {
-            throw new IllegalArgumentException(
-                    "Khoảng ngày không hợp lệ."
-            );
-        }
-    }
+    // =====================================================================
+    // 4. HÀM HỖ TRỢ KIỂM TRA DỮ LIỆU
+    // =====================================================================
 
     /**
      * Kiểm tra dữ liệu phòng.
