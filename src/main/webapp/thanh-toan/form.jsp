@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tạo thanh toán | Horizon Hotel</title>
+    <title>Tạo thanh toán | UTE Hotel</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
@@ -351,7 +351,7 @@
 
     <header class="page-heading">
         <div>
-            <div class="eyebrow">Horizon Hotel / Tài chính</div>
+            <div class="eyebrow">UTE Hotel / Tài chính</div>
             <h1>Tạo thanh toán</h1>
             <p class="subtitle">
                 Ghi nhận giao dịch thanh toán cho hóa đơn của khách hàng.

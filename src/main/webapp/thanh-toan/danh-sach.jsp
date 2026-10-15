@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý thanh toán | Horizon Hotel</title>
+    <title>Quản lý thanh toán | UTE Hotel</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
 
     <style>
@@ -398,7 +398,7 @@
 
     <header class="payment-head">
         <div>
-            <p class="payment-eyebrow">Horizon Hotel / Tài chính</p>
+            <p class="payment-eyebrow">UTE Hotel / Tài chính</p>
             <h1 class="payment-title">Quản lý thanh toán</h1>
             <p class="payment-subtitle">
                 Theo dõi giao dịch, trạng thái thu tiền và lịch sử thanh toán của khách.

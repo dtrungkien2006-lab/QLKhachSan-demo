@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chi tiết hóa đơn | Horizon Hotel</title>
+    <title>Chi tiết hóa đơn | UTE Hotel</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
@@ -423,7 +423,7 @@
 
     <header class="page-heading">
         <div>
-            <div class="eyebrow">Horizon Hotel / Tài chính</div>
+            <div class="eyebrow">UTE Hotel / Tài chính</div>
             <h1>Chi tiết hóa đơn</h1>
             <p class="page-description">
                 Xem thông tin chứng từ, các khoản thu và tổng chi phí lưu trú.
@@ -607,7 +607,7 @@
         </div>
 
         <div class="footer-note">
-            Horizon Hotel · Quản lý hóa đơn
+            UTE Hotel · Quản lý hóa đơn
         </div>
     </footer>
 

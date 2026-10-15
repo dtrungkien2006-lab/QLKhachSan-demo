@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo đặt phòng | Horizon Hotel</title>
+    <title>Tạo đặt phòng | UTE Hotel</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/app.css">
@@ -518,7 +518,7 @@
 <div class="booking-page">
 
     <nav class="booking-breadcrumb" aria-label="Điều hướng">
-        <a href="${pageContext.request.contextPath}/">Horizon Hotel</a>
+        <a href="${pageContext.request.contextPath}/">UTE Hotel</a>
         <span>/</span>
         <a href="${pageContext.request.contextPath}/dat-phong?action=list">
             Đặt phòng

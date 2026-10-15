@@ -11,7 +11,7 @@ public class DataSourceConfig {
 
         config.setJdbcUrl(getConfig("DB_URL","jdbc:mysql://localhost:3306/QLKhachSan"+ "?allowPublicKeyRetrieval=true"+ "&useSSL=false"+ "&serverTimezone=Asia/Ho_Chi_Minh"+ "&characterEncoding=UTF-8"));
         config.setUsername(getConfig("DB_USERNAME", "root"));
-        config.setPassword(getConfig("DB_PASSWORD", "123456"));
+        config.setPassword(getConfig("DB_PASSWORD", "123123"));
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
         // Connection pool

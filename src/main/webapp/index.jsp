@@ -10,7 +10,7 @@
 <body>
 <div class="app-shell">
   <aside class="sidebar">
-    <a class="brand" href="${pageContext.request.contextPath}/"><span class="brand-mark">H</span><span><span class="brand-name">Horizon Hotel</span><br><span class="brand-sub">HOTEL MANAGEMENT</span></span></a>
+    <a class="brand" href="${pageContext.request.contextPath}/"><span class="brand-mark">H</span><span><span class="brand-name">UTE Hotel</span><br><span class="brand-sub">HOTEL MANAGEMENT</span></span></a>
     <div><div class="nav-label">Tổng quan</div><nav class="nav-list">
       <a class="nav-link active" href="${pageContext.request.contextPath}/"><span class="nav-icon">▦</span>Dashboard</a>
     </nav></div>

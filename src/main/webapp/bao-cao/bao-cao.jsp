@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Báo cáo | Horizon Hotel</title>
+    <title>Báo cáo | UTE Hotel</title>
     <style>
         :root { --xanh:#2563eb; --nen:#f8fafc; --vien:#e2e8f0; --chu:#0f172a; --mo:#64748b; }
         table { width:100%; border-collapse:collapse; margin:10px 0 24px; background: #fff; }

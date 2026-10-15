@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý hóa đơn | Horizon Hotel</title>
+    <title>Quản lý hóa đơn | UTE Hotel</title>
 
     <style>
         :root {
@@ -660,7 +660,7 @@
                     </strong>
                     hóa đơn
                 </span>
-                <span>Horizon Hotel · Quản lý tài chính</span>
+                <span>UTE Hotel · Quản lý tài chính</span>
             </div>
         </section>
     </main>

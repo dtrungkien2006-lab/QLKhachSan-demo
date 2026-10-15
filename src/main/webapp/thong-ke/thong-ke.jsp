@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thống kê | Horizon Hotel</title>
+    <title>Thống kê | UTE Hotel</title>
     <style>
         :root { --xanh:#2563eb; --nen:#f8fafc; --vien:#e2e8f0; --chu:#0f172a; --mo:#64748b; }
         .page-title { margin-bottom: 20px; }

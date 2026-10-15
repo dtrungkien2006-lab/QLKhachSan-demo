@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý dịch vụ | Horizon Hotel</title>
+    <title>Quản lý dịch vụ | UTE Hotel</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
     <style>
         .service-page{max-width:1500px;margin:0 auto;padding:30px 34px 42px}
