@@ -1,4 +1,3 @@
-
 package com.hotel.controller;
 
 import com.hotel.entity.KhachHang;
