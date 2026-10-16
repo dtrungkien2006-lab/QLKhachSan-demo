@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thống kê | UTE Hotel</title>
+    <title>Thống kê | Horizon Hotel</title>
     <style>
         :root { --xanh:#2563eb; --nen:#f8fafc; --vien:#e2e8f0; --chu:#0f172a; --mo:#64748b; }
         .page-title { margin-bottom: 20px; }
@@ -128,7 +128,22 @@
     <div class="charts">
         <div class="chart-box"><h4>Doanh thu theo thời gian (đồng)</h4><canvas id="bdDoanhThu"></canvas></div>
         <div class="chart-box"><h4>Nguồn thu: phòng và dịch vụ</h4><canvas id="bdNguonThu"></canvas></div>
-        <div class="chart-box"><h4>Thực thu theo phương thức</h4><canvas id="bdPhuongThuc"></canvas></div>
+        <div class="chart-box">
+            <h4>Thực thu theo phương thức</h4>
+            <canvas id="bdPhuongThuc"></canvas>
+            <p id="bdPhuongThucEmpty" class="ghichu" hidden>Không có giao dịch thanh toán thành công trong kỳ đã chọn.</p>
+        </div>
+    </div>
+    <%-- Chuyển dữ liệu thực thu theo phương thức từ DTO sang DOM để Chart.js đọc. --%>
+    <div class="du-lieu-phuong-thuc" hidden aria-hidden="true">
+        <c:forEach var="pt" items="${doanhThu.thucThuTheoPhuongThuc}">
+            <c:choose>
+                <c:when test="${pt.key == 'TIEN_MAT'}"><span class="pt" data-label="Tiền mặt" data-v="${pt.value}"></span></c:when>
+                <c:when test="${pt.key == 'VNPAY'}"><span class="pt" data-label="VNPay" data-v="${pt.value}"></span></c:when>
+                <c:when test="${pt.key == 'MOMO'}"><span class="pt" data-label="MoMo" data-v="${pt.value}"></span></c:when>
+                <c:otherwise><span class="pt" data-label="${pt.key}" data-v="${pt.value}"></span></c:otherwise>
+            </c:choose>
+        </c:forEach>
     </div>
     <table>
         <thead>
@@ -222,7 +237,23 @@
         { ten: 'Tiền dịch vụ', gia: doc('.dt', function (e) { return +e.dataset.dv; }) }], { chong: true });
     var tp = ${empty doanhThu ? 0 : doanhThu.tongTienPhong}, tdv = ${empty doanhThu ? 0 : doanhThu.tongTienDichVu};
     if (co('bdNguonThu')) banh('bdNguonThu', ['Tiền phòng', 'Tiền dịch vụ'], [tp, tdv]);
-    banh('bdPhuongThuc', doc('.pt', function (e) { return e.dataset.label; }), doc('.pt', function (e) { return +e.dataset.v; }));
+
+    // Lấy dữ liệu .pt do JSP tạo từ doanhThu.thucThuTheoPhuongThuc.
+    // Nếu kỳ đã chọn chưa có giao dịch thành công thì hiển thị thông báo rõ ràng.
+    var ptNhan = doc('.pt', function (e) { return e.dataset.label; });
+    var ptGiaTri = doc('.pt', function (e) { return Number(e.dataset.v) || 0; });
+    var ptCanvas = co('bdPhuongThuc');
+    var ptEmpty = co('bdPhuongThucEmpty');
+    if (ptCanvas) {
+        if (ptNhan.length === 0 || ptGiaTri.every(function (v) { return v <= 0; })) {
+            ptCanvas.style.display = 'none';
+            if (ptEmpty) ptEmpty.hidden = false;
+        } else {
+            ptCanvas.style.display = '';
+            if (ptEmpty) ptEmpty.hidden = true;
+            banh('bdPhuongThuc', ptNhan, ptGiaTri);
+        }
+    }
 
     cot('bdKhach', doc('.kh', function (e) { return e.dataset.ten; }),
         [{ ten: 'Số đêm lưu trú', gia: doc('.kh', function (e) { return +e.dataset.dem; }) }], { ngang: true });
