@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -6,7 +7,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thông tin khách hàng</title><link rel="stylesheet" href="${pageContext.request.contextPath}/css/app.css">
+    <title>Thông tin khách hàng</title>
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/app.css">
 
     <style>
         * {
@@ -140,13 +144,29 @@
           accept-charset="UTF-8"
           action="${pageContext.request.contextPath}/khach-hang">
 
-        <label for="maKH">Mã khách hàng</label>
-        <input type="text"
-               id="maKH"
-               name="maKH"
-               value="<c:out value='${item.maKH}'/>"
-               placeholder="Để trống nếu thêm mới"
-               readonly>
+        <!-- Phân biệt rõ thêm mới và cập nhật -->
+        <c:choose>
+            <c:when test="${not empty item}">
+                <input type="hidden" name="action" value="update">
+
+                <label for="maKH">Mã khách hàng</label>
+                <input type="text"
+                       id="maKH"
+                       name="maKH"
+                       value="<c:out value='${item.maKH}'/>"
+                       readonly>
+            </c:when>
+
+            <c:otherwise>
+                <input type="hidden" name="action" value="create">
+
+                <label for="maKH">Mã khách hàng</label>
+                <input type="text"
+                       id="maKH"
+                       value="Tự động tạo khi lưu thành công"
+                       readonly>
+            </c:otherwise>
+        </c:choose>
 
         <label for="hoTen">Họ và tên *</label>
         <input type="text"
@@ -176,23 +196,15 @@
         <select id="gioiTinh" name="gioiTinh">
             <option value="">-- Chọn giới tính --</option>
 
-            <c:choose>
-                <c:when test="${gioiTinhDaChon eq 'NAM'}">
-                    <option value="NAM" selected>Nam</option>
-                </c:when>
-                <c:otherwise>
-                    <option value="NAM">Nam</option>
-                </c:otherwise>
-            </c:choose>
+            <option value="NAM"
+                ${gioiTinhDaChon eq 'NAM' ? 'selected' : ''}>
+                Nam
+            </option>
 
-            <c:choose>
-                <c:when test="${gioiTinhDaChon eq 'NU'}">
-                    <option value="NU" selected>Nữ</option>
-                </c:when>
-                <c:otherwise>
-                    <option value="NU">Nữ</option>
-                </c:otherwise>
-            </c:choose>
+            <option value="NU"
+                ${gioiTinhDaChon eq 'NU' ? 'selected' : ''}>
+                Nữ
+            </option>
         </select>
 
         <label for="soDienThoai">Số điện thoại *</label>
@@ -228,5 +240,8 @@
 
     </form>
 </div>
-<script src="${pageContext.request.contextPath}/js/shared-layout.js" defer></script></body>
+
+<script src="${pageContext.request.contextPath}/js/shared-layout.js"
+        defer></script>
+</body>
 </html>
